@@ -1,0 +1,15 @@
+# Model tests verified on Python 3.12, macOS arm64, CPU.
+# The pinned SciPy macOS arm64 wheel requires macOS 14 or later.
+# DGL/torch/torchdata are coupled binary/API dependencies; upgrade together.
+# CUDA requires a matching CUDA-enabled DGL wheel and PyTorch installation.
+torch==2.2.2
+dgl==2.2.0
+torchdata==0.7.1
+numpy==1.26.4
+scipy==1.17.1
+pandas==3.0.6
+networkx==3.7
+scikit-learn==1.9.1
+PyYAML==6.0.3
+pydantic==2.13.5  # Imported by DGL GraphBolt; keep despite no direct project import.
+pytest==9.1.1
