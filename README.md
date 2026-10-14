@@ -4,8 +4,9 @@
 
 Reproduce the authors’ **BRCA** model architecture, processed-data graph inputs,
 training, three-fold cross-validation, and evaluation in a readable Python project.
-This is a group-project reimplementation, not an official release. Raw TCGA
-preprocessing, other cancers, and algorithm improvements are outside this stage.
+This is a group-project reimplementation, not an official release. The baseline
+uses supplied processed inputs; separate raw-input source preparation is
+documented below. Other cancers and algorithm improvements are outside this stage.
 
 ## Original paper and repository
 
@@ -62,7 +63,8 @@ DriverMONI-Reproduction/
 ├── .gitignore
 ├── pytest.ini
 ├── configs/
-│   └── brca.yaml               # Verified defaults and explicit new settings
+│   ├── brca.yaml               # Baseline training settings
+│   └── brca_preprocessing.json # Complete source-preparation workflow
 ├── src/
 │   ├── __init__.py
 │   ├── models/
@@ -71,6 +73,8 @@ DriverMONI-Reproduction/
 │   │   ├── gat.py
 │   │   └── drivermoni.py
 │   ├── dataset.py             # Features, labels, samples, batching
+│   ├── feature_schema.py      # Shared feature order for preprocessing and loading
+│   ├── preprocessing/         # Acquisition, mutation/expression, KEGG and PPI
 │   ├── graph_utils.py         # PPI loading and ego graphs
 │   ├── train.py               # Training and three-fold CV
 │   ├── evaluate.py            # Scores and metrics
@@ -78,7 +82,8 @@ DriverMONI-Reproduction/
 ├── scripts/
 │   ├── run_brca.py            # Full experiment
 │   ├── debug_brca.py          # Inspect graph inputs
-│   └── smoke_test.py          # Small real-data pipeline check
+│   ├── smoke_test.py          # Small real-data pipeline check
+│   └── preprocess_brca.py     # One raw-to-feature BRCA export
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
@@ -140,6 +145,15 @@ not validated here. `device: auto` uses CUDA when available, otherwise CPU;
 `--device cpu` forces the validated execution path. MPS is not selected.
 
 ## Data preparation
+
+Run `python3 scripts/preprocess_brca.py` to acquire pinned mutation/expression
+inputs, KEGG/HGNC memberships and the authors' mapped HumanNet v3 network.
+It writes one complete feature table, `data/brca/BRCA_input_data.csv`, plus
+compact audits and a checksum manifest, using only Python's standard library.
+All commands share `data/cache/`; replay tests use temporary directories.
+See [BRCA source preparation](docs/brca_source_preparation.md) for source limits,
+offline verification and optional modality diagnostics. Training still uses
+the baseline processed inputs below.
 
 From the project root, obtain the pinned upstream files directly from the authors:
 
@@ -306,8 +320,9 @@ python -m pytest -q tests
 ```
 
 Tests that require original source/data skip explicitly when those files are not
-provided. Standalone verification here: **55 passed, 24 skipped** (including the
-unavailable CUDA test). For the complete parity suite, supply the separately obtained checkout:
+provided. Raw preprocessing also has a standard-library test suite and an
+optional cached-source replay test; see [BRCA source preparation](docs/brca_source_preparation.md).
+For the complete parity suite, supply the separately obtained checkout:
 
 ```bash
 python -m pytest -q tests --brca-data-root data/upstream
@@ -318,7 +333,8 @@ module-level imports, CLI execution, and data-loading code are not run. Minimal
 CPU/DGL compatibility adapters are audited. No verbatim reference class files are
 shipped. A data-only directory cannot run original-source parity comparisons.
 
-Latest full verification: **78 passed, 1 skipped** (CUDA unavailable). Intermediate
+Latest full verification: **103 passed, 2 skipped** (CUDA unavailable; optional
+raw-source replay runs separately). Intermediate
 tensors/logits match exactly on controlled CPU fixtures with transferred active
 weights; gradients and one Adam update agree within numerical tolerance. Five
 real BRCA graphs match by gene identity, features, labels, and directed edge
