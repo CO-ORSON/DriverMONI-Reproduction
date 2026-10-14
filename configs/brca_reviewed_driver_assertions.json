@@ -1,0 +1,66 @@
+{
+  "review_version": "2026-10-13",
+  "scope": "Literature spot-check from the BRCA label audit; not an exhaustive review or a CGC reconstruction.",
+  "assertions": [
+    {
+      "study_id": "DOI:10.1038/nature11412",
+      "source_url": "https://www.nature.com/articles/nature11412",
+      "publication_year": 2012,
+      "setting": "somatic",
+      "assertion": "reviewed_somatic_BRCA_driver_evidence",
+      "gene_symbols": ["PTEN", "NF1", "SF3B1", "PIK3R1", "KMT2C", "RUNX1", "CBFB"],
+      "alteration_mechanism": "somatic_SNV_indel_or_loss_of_function",
+      "cohort_id": "TCGA_BRCA_2012",
+      "cohort_overlap": "same_project_possible_sample_overlap",
+      "review_note": "TCGA identifies PTEN and historical MLL3 (KMT2C) among previously implicated breast genes, and NF1, SF3B1, PIK3R1, RUNX1 and CBFB among significantly mutated genes. Support is gene-level literature evidence, not proof that every variant is a driver."
+    },
+    {
+      "study_id": "DOI:10.1038/nature11154",
+      "source_url": "https://www.nature.com/articles/nature11154",
+      "publication_year": 2012,
+      "setting": "somatic",
+      "assertion": "reviewed_somatic_BRCA_driver_evidence",
+      "gene_symbols": ["RUNX1", "CBFB"],
+      "alteration_mechanism": "somatic_loss_of_function",
+      "cohort_id": "BANERJI_MEXICO_VIETNAM_2012",
+      "cohort_overlap": "sample_overlap_not_verified",
+      "review_note": "Study reports recurrent CBFB inactivation and RUNX1 deletions in breast tumours. This is additional supporting study evidence; patient-level independence from TCGA has not been audited."
+    },
+    {
+      "study_id": "DOI:10.1038/ncomms11479",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4866047/",
+      "publication_year": 2016,
+      "setting": "somatic",
+      "assertion": "reviewed_somatic_BRCA_driver_evidence",
+      "gene_symbols": ["RUNX1", "CBFB", "SF3B1"],
+      "alteration_mechanism": "somatic_SNV_indel",
+      "cohort_id": "METABRIC_2433_PRIMARY_TUMOURS",
+      "cohort_overlap": "sample_overlap_not_verified",
+      "review_note": "METABRIC describes RUNX1/CBFB inactivating mutations and recurrent SF3B1 K700E among mutation-driver findings. This review covers these statements rather than claiming extraction of the complete 40-gene list."
+    },
+    {
+      "study_id": "DOI:10.1056/NEJMoa1913948",
+      "source_url": "https://www.nejm.org/doi/full/10.1056/NEJMoa1913948",
+      "publication_year": 2021,
+      "setting": "germline",
+      "assertion": "reviewed_germline_breast_risk_evidence",
+      "gene_symbols": ["ATM", "RAD51C", "RAD51D"],
+      "alteration_mechanism": "pathogenic_germline_protein_truncating_variants",
+      "cohort_id": "BCAC_CASE_CONTROL_113000_WOMEN",
+      "cohort_overlap": "different_study_design_sample_overlap_not_verified",
+      "review_note": "Germline breast-risk evidence is kept separate and does not promote a gene to the somatic-driver category."
+    },
+    {
+      "study_id": "DOI:10.1056/NEJMoa2005936",
+      "source_url": "https://www.nejm.org/doi/full/10.1056/NEJMoa2005936",
+      "publication_year": 2021,
+      "setting": "germline",
+      "assertion": "limited_negative_germline_association_evidence",
+      "gene_symbols": ["NBN"],
+      "alteration_mechanism": "tested_pathogenic_germline_variants",
+      "cohort_id": "CARRIERS_CASE_CONTROL_2021",
+      "cohort_overlap": "different_study_design_sample_overlap_not_verified",
+      "review_note": "No increased breast-risk association was found for the examined NBN variants. This is context-limited negative evidence, not a somatic gene-level negative label."
+    }
+  ]
+}

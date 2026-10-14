@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "cache_dir": "data/cache",
+  "output_dir": "data/brca_driver_evidence",
+  "canonical_features": "data/brca/BRCA_input_data.csv",
+  "reviewed_assertions": "configs/brca_reviewed_driver_assertions.json",
+  "sources": {
+    "oncokb_metadata": {
+      "url": "https://www.oncokb.org/api/v1/info",
+      "format": "text",
+      "sha256": "80a4132388684d5852e496934e1d826d249da552801f63568d566e830db7cb2a"
+    },
+    "oncokb_gene_list": {
+      "url": "https://www.oncokb.org/api/v1/utils/cancerGeneList.txt",
+      "format": "text",
+      "sha256": "576d3955b55989c9ab62c21c09a2405c4d997891c8acd7e62e6ad6272bf7b5c3"
+    },
+    "oncokb_curated_genes": {
+      "url": "https://www.oncokb.org/api/v1/utils/allCuratedGenes.txt?includeEvidence=true",
+      "format": "text",
+      "sha256": "3504e055f1a668aeaad883f31c15af36f6c004f6693d1ad74255bc43acd9e230"
+    },
+    "intogen_drivers": {
+      "url": "https://www.intogen.org/download?file=IntOGen-Drivers-20240920.zip",
+      "format": "zip",
+      "advertised_release": "2024-09-20",
+      "sha256": "854def4465bcd7f90f0f8c7857dee9a4cf9da66a4c477c3fe4abeb510358a53c"
+    },
+    "intogen_cohorts": {
+      "url": "https://www.intogen.org/download?file=IntOGen-Cohorts-20240920.zip",
+      "format": "zip",
+      "advertised_release": "2024-09-20",
+      "sha256": "f2643874217500dfc3a7099547df7d83a17a97afc3daeff7f861b8f722362287"
+    },
+    "hgnc": {
+      "url": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+      "format": "text",
+      "release": "2026-10-06",
+      "sha256": "8bf6f686e640dbc864a346484626953621b0500d900d26cd085a35c2782d725d"
+    },
+    "ensembl": {
+      "url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+      "format": "gzip",
+      "release": 102,
+      "sha256": "307038294611aaf86c3e61e70273a26c7b3a343cd416feed137e6e86d471ea32"
+    },
+    "benchmark_features": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_preprocessed_file/BRCA_input_data.csv",
+      "format": "text",
+      "sha256": "b9c094debed2c90dd0c93c6272b6e9b93fe69b87a51fd8473030a4589a3034a3"
+    },
+    "benchmark_labels": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+      "format": "text",
+      "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9"
+    },
+    "comparison_genes": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_concat_data/after_concat_BRCA_genes2.csv",
+      "format": "text",
+      "sha256": "3bfad20951a0849d2f57d9bdd75601b68654aaf993aa59eb74615f9e213e5954"
+    },
+    "gene_annotations": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/gene_info_for_GOSemSim.csv",
+      "format": "text",
+      "sha256": "aa8a76de8838a73880c34707453da12728c0662edeab1bd056688745bca9f95a"
+    }
+  }
+}
