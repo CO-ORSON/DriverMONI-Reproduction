@@ -1,0 +1,6 @@
+{
+  "pathway_name": "Breast cancer",
+  "hgnc_snapshot": "2026-10-06",
+  "cache_dir": "data/cache",
+  "output_dir": "data/diagnostics/pathways"
+}

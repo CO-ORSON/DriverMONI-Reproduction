@@ -1,0 +1,47 @@
+{
+  "profile": "authors_pinned_input_snapshot",
+  "upstream_commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b",
+  "cache_dir": "data/cache",
+  "output_dir": "data/diagnostics/omics",
+  "sources": {
+    "mutation": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_mutation.zip",
+      "format": "zip",
+      "member": "BRCA.varscan.maf",
+      "workflow": "Authors' TCGA BRCA VarScan MAF; historical GDC version in header"
+    },
+    "expression": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_expression.zip",
+      "format": "zip",
+      "member": "BRCA-gene-exp.tsv",
+      "unit": "author_supplied_scale_not_documented",
+      "transform": "identity"
+    },
+    "annotation": {
+      "url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+      "format": "gzip",
+      "release": 102,
+      "assembly": "GRCh38"
+    },
+    "protein_filter": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/hsa_id_conv.txt",
+      "format": "text",
+      "annotation_release": "Not documented by authors"
+    },
+    "fallback_mapping": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/gene_ensembl_mapping.pickle",
+      "format": "pickle"
+    },
+    "consequence_terms": {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/soterm_list.txt",
+      "format": "text"
+    }
+  },
+  "expression_tumor_codes": ["01"],
+  "expression_normal_codes": ["11"],
+  "gene_mapping_policy": "unique_ensembl_release_symbol_then_authors_fallback",
+  "mutation_consequence_policy": "all_effects_exact_terms_keep_transcript_multiplicity",
+  "mutation_filter_policy": "as_supplied_no_additional_filter",
+  "cohort_policy": "independent_mutation_and_expression_cohorts",
+  "missing_expression_policy": "exclude_and_report"
+}
