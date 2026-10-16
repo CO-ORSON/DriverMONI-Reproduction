@@ -4,7 +4,7 @@ Two independent workflows are available: **reproduce the original benchmark**
 using the authors' processed inputs, or **generate a canonical dataset** from
 retrieved raw/reference sources. The training loader currently uses the original
 benchmark inputs; canonical generation does not switch its configuration.
-Downloaded and generated data are excluded from Git.
+The canonical BRCA feature dataset is available at `data/brca/BRCA_input_data.csv`. The linked driver-evidence and gene-status tables are available under `data/brca_driver_evidence/`.
 
 ## Generate the canonical BRCA dataset
 

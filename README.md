@@ -23,9 +23,9 @@ precedence when it differs from the paper. See
 [REPRODUCTION_NOTES.md](REPRODUCTION_NOTES.md) for the component-by-component audit.
 
 No license or redistribution grant was found in the pinned original repository.
-Original source bodies, processed data, and the paper PDF are **not bundled in
-this Git project**. Optional parity tests read a separately obtained local source
-checkout. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and
+Original source bodies, author-supplied processed data, and the paper PDF are
+**not bundled in this Git project**. Optional parity tests read a separately
+obtained local source checkout. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and
 licensing status; this project does not grant rights to upstream materials.
 
 ## Model architecture
@@ -63,8 +63,12 @@ DriverMONI-Reproduction/
 ├── .gitignore
 ├── pytest.ini
 ├── configs/
-│   ├── brca.yaml               # Baseline training settings
-│   └── brca_preprocessing.json # Complete source-preparation workflow
+│   ├── brca.yaml                      # Baseline training settings
+│   ├── brca_preprocessing.json        # Combined canonical dataset workflow
+│   ├── brca_omics_sources.json        # Mutation/expression sources and policies
+│   ├── brca_sources.json              # KEGG retrieval and HGNC snapshot
+│   ├── brca_driver_evidence.json      # Driver-evidence sources and output settings
+│   └── brca_reviewed_driver_assertions.json # Reviewed literature assertions
 ├── src/
 │   ├── __init__.py
 │   ├── models/
@@ -74,16 +78,26 @@ DriverMONI-Reproduction/
 │   │   └── drivermoni.py
 │   ├── dataset.py             # Features, labels, samples, batching
 │   ├── feature_schema.py      # Shared feature order for preprocessing and loading
-│   ├── preprocessing/         # Acquisition, mutation/expression, KEGG and PPI
+│   ├── preprocessing/
+│   │   ├── __init__.py
+│   │   ├── acquisition.py          # Download cache and source locks
+│   │   ├── common.py               # Shared artifact/provenance utilities
+│   │   ├── brca.py                 # Combined raw-to-feature workflow
+│   │   ├── brca_omics.py           # Mutation, expression and scalar PPI features
+│   │   ├── brca_sources.py         # KEGG/HGNC retrieval and label coverage audit
+│   │   └── brca_driver_evidence.py # Linked source assertions and gene status
 │   ├── graph_utils.py         # PPI loading and ego graphs
 │   ├── train.py               # Training and three-fold CV
 │   ├── evaluate.py            # Scores and metrics
 │   └── utils.py               # Seeds, config, devices, provenance
 ├── scripts/
-│   ├── run_brca.py            # Full experiment
-│   ├── debug_brca.py          # Inspect graph inputs
-│   ├── smoke_test.py          # Small real-data pipeline check
-│   └── preprocess_brca.py     # One raw-to-feature BRCA export
+│   ├── run_brca.py                    # Full benchmark experiment
+│   ├── debug_brca.py                  # Inspect graph inputs
+│   ├── smoke_test.py                  # Small real-data pipeline check
+│   ├── preprocess_brca.py             # Combined canonical BRCA export
+│   ├── preprocess_brca_omics.py       # Optional omics diagnostics
+│   ├── preprocess_brca_sources.py     # Optional pathway/label diagnostics
+│   └── prepare_brca_driver_evidence.py # Build linked evidence/status tables
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
@@ -95,21 +109,40 @@ DriverMONI-Reproduction/
 │   ├── test_training.py
 │   ├── test_portability.py
 │   ├── test_intermediate_parity.py
-│   └── test_source_audit.py
+│   ├── test_source_audit.py
+│   ├── test_brca_omics.py
+│   ├── test_brca_sources.py
+│   ├── test_brca_pipeline.py
+│   ├── test_brca_snapshot.py        # Optional cached-source replay
+│   └── test_brca_driver_evidence.py
 ├── docs/
 │   ├── graph_inputs.md
 │   ├── training_protocol.md
 │   ├── configuration.md
-│   └── teammate_review.md
+│   ├── teammate_review.md
+│   ├── data_sources.md             # Source inventory and provenance limits
+│   ├── brca_source_preparation.md  # Acquisition, formulas and validation
+│   └── brca_driver_evidence.md     # Evidence rules, qualifications and replay
+├── notebooks/
+│   └── brca_driver_evidence_audit.ipynb # Source reconciliation and replay audit
 ├── data/
-│   └── README.md              # Required files and acquisition commands
+│   ├── README.md                  # Workflows, feature purpose and comparisons
+│   ├── brca/
+│   │   ├── BRCA_input_data.csv    # Canonical 13-feature gene dataset
+│   │   ├── manifest.json          # Sources, policies and artifact checksums
+│   │   └── summary.json           # Gene/sample coverage and exclusions
+│   └── brca_driver_evidence/
+│       ├── brca_driver_evidence.csv # Source assertions linked by evidence ID
+│       ├── brca_gene_status.csv     # Per-gene evidence status and benchmark labels
+│       ├── manifest.json           # Evidence-source provenance and checksums
+│       └── summary.json            # Evidence coverage and review counts
 └── results/
     └── README.md              # Output schema and interpretation
 ```
 
-Environments, downloaded data/source, results JSON, caches, and checkpoints are
-local artifacts excluded from Git. Share the Git repository, not a ZIP of the
-entire working directory containing ignored files.
+The canonical feature CSV, manifest and summary under `data/brca/`, plus the
+driver-evidence tables, manifest and summary under `data/brca_driver_evidence/`,
+are eligible for Git tracking.
 
 ## Environment setup
 

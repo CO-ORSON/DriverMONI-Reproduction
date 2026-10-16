@@ -25,8 +25,8 @@ included in the repository. The upstream files themselves are not modified.
 This is a source-informed reimplementation, not an independently staffed
 clean-room implementation or a legal certification of redistribution rights.
 
-Processed BRCA data, HumanNet files, neighbor caches, original source, raw TCGA
-data, and the paper PDF are not distributed with this project. Teammates obtain
+Original processed BRCA data, HumanNet files, neighbor caches, original source,
+raw TCGA data, and the paper PDF are not distributed with this project. Teammates obtain
 the necessary files directly from the authors using [data/README.md](data/README.md).
 That acquisition does not confer downstream redistribution rights. Upstream and
 underlying data-provider terms remain applicable; obtain permission before

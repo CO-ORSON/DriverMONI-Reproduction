@@ -1,0 +1,74 @@
+{
+  "profile": "BRCA_driver_evidence_v1",
+  "evidence_rows": 3787,
+  "gene_status_rows": 16980,
+  "resolved_gene_rows": 16971,
+  "unresolved_source_entities": 9,
+  "source_record_counts": {
+    "OncoKB": 2391,
+    "IntOGen": 1338,
+    "CGC": 42,
+    "PrimaryLiterature": 16
+  },
+  "evidence_status_counts": {
+    "insufficient_evidence": 14903,
+    "unresolved_candidate": 2070,
+    "supported_somatic_BRCA_driver": 7
+  },
+  "benchmark_positive_genes": 42,
+  "benchmark_evaluated_genes": 15028,
+  "benchmark_unlabelled_genes": 14986,
+  "supported_genes_with_benchmark_zero": [
+    "KMT2C",
+    "CBFB",
+    "SF3B1",
+    "PIK3R1",
+    "RUNX1",
+    "PTEN",
+    "NF1"
+  ],
+  "unresolved_mapping_records": 14,
+  "mapping_status_counts": {
+    "unique_hgnc_ncbi": 2377,
+    "unique_hgnc_symbol": 1300,
+    "supplied_Ensembl_ID": 42,
+    "unique_hgnc_symbol;transcript_not_in_release102": 49,
+    "unique_ensembl102_symbol": 5,
+    "unmapped": 14
+  },
+  "intogen_filtered_BRCA_records": 287,
+  "intogen_filtered_BRCA_genes": 118,
+  "versions": {
+    "OncoKB": {
+      "version": "v7.6",
+      "date": "09/30/2026"
+    },
+    "IntOGen": {
+      "intogen_drivers": {
+        "archive_directory": "2024-06-18_IntOGen-Drivers",
+        "readme_release": "20230531",
+        "advertised_release": "2024-09-20"
+      },
+      "intogen_cohorts": {
+        "archive_directory": "2024-06-18_IntOGen-Cohorts",
+        "readme_release": "not_declared",
+        "advertised_release": "2024-09-20"
+      }
+    },
+    "HGNC": "2026-10-06",
+    "Ensembl": 102
+  },
+  "coverage": {
+    "CGC": "42 DriverMONI positives used as paper-attributed v95 subset at user request; full export unavailable, extraction and tiers unverified",
+    "OncoKB": "Full public gene-list and somatic/germline curated-gene exports; tumour/alteration-level export requires authorization and was not acquired",
+    "IntOGen": "Complete downloaded compendium, unfiltered assertions and cohort metadata; BRCA records selected by exact cancer code",
+    "literature": "Literature spot-check from the BRCA label audit; not an exhaustive review or a CGC reconstruction."
+  },
+  "limits": [
+    "IntOGen advertised filename, archive directory and README release disagree; all labels and hashes are preserved rather than silently choosing a version.",
+    "Gene-status decisions are evidence reviews, not a new training-label export; all original positives remain unchanged.",
+    "No confirmed gene-level negatives are asserted. Rejected IntOGen calls and germline non-association findings are not somatic negative labels.",
+    "Shared publications and patient overlap are not fully resolved; database/cohort counts are not counts of independent validations.",
+    "OncoKB summary mentions and therapeutic levels do not establish alteration oncogenicity or somatic BRCA specificity."
+  ]
+}
