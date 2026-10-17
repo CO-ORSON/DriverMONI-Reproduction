@@ -64,6 +64,7 @@ DriverMONI-Reproduction/
 ├── pytest.ini
 ├── configs/
 │   ├── brca.yaml                      # Baseline training settings
+│   ├── brca_updated_data.yaml         # Separate experiment using data/brca CSV
 │   ├── brca_preprocessing.json        # Combined canonical dataset workflow
 │   ├── brca_omics_sources.json        # Mutation/expression sources and policies
 │   ├── brca_sources.json              # KEGG retrieval and HGNC snapshot
@@ -185,8 +186,10 @@ It writes one complete feature table, `data/brca/BRCA_input_data.csv`, plus
 compact audits and a checksum manifest, using only Python's standard library.
 All commands share `data/cache/`; replay tests use temporary directories.
 See [BRCA source preparation](docs/brca_source_preparation.md) for source limits,
-offline verification and optional modality diagnostics. Training still uses
-the baseline processed inputs below.
+offline verification and optional modality diagnostics. The default training
+configuration uses the baseline inputs below. The separate
+[new-data experiment](docs/brca_updated_data_experiment.md) uses the uploaded
+`data/brca/BRCA_input_data.csv` without regenerating it.
 
 From the project root, obtain the pinned upstream files directly from the authors:
 
@@ -254,12 +257,29 @@ coverage and source-compatible train/eval mode changes. Output goes to
 `results/brca_smoke_metrics.json`, leaving the full experiment report untouched.
 Its scores are a pipeline check, not a BRCA performance estimate.
 
+### Run with the newly prepared dataset
+
+To train on the newly prepared CSV instead, place the original labels and HumanNet
+ZIP under `data/upstream` and run:
+
+```bash
+python scripts/run_brca.py --config configs/brca_updated_data.yaml --device cpu
+```
+
+This separate experiment uses all 16,786 genes, rebuilds PPI neighborhoods and
+writes `results/brca_updated_data_metrics.json`. It keeps the model and training
+settings below, but disables the original comparison-gene filter. See the
+[input layout, PyCharm instructions and provenance limits](docs/brca_updated_data_experiment.md).
+The original configuration and its results remain available.
+
 ## Training procedure
 
-1. Read processed features; reproduce the original symbol deduplication and
-   comparison-gene/annotation filters. Label membership in the supplied driver list.
+1. Read processed features and apply symbol deduplication. The baseline also
+   applies the original comparison-gene/annotation filters; the new-data
+   configuration explicitly disables them. Label membership in the supplied driver list.
 2. Split targets using `StratifiedKFold(n_splits=3, shuffle=True, random_state=seed)`.
-   Graph features retain full filtered context across folds; labels are not features.
+   Graph features retain the full context selected by the active configuration
+   across folds; labels are not features.
 3. Create a fresh model and Adam optimizer per fold. Compute training-fold weights
    `w_c = (1 / n_c) * (N_train / 2)`, ordered `[non_driver, driver]`.
 4. Train with weighted mean NLL after float64 log-softmax, Adam learning rate 0.001,
@@ -298,7 +318,7 @@ High overall accuracy should be interpreted with the severe class imbalance.
 
 ## Results
 
-A complete local seed-42 CPU run finished all 30 epochs in approximately 16.6
+A complete original-data baseline seed-42 CPU run finished all 30 epochs in approximately 16.6
 minutes. These are results of this implementation and protocol, not a claim of
 matching the paper’s scores.
 
@@ -317,6 +337,15 @@ included in Git. A teammate regenerates it with the command above. It includes
 fold IDs, predictions, effective configuration, runtime versions, input SHA-256
 hashes, counts, weights, epoch histories, and completion status. Only
 `status: complete` represents a finished run. See [results/README.md](results/README.md).
+
+The separate **new-data experiment** completed all three folds and 30 epochs on
+17 October 2026 in 19.7 minutes on CPU. With all 16,786 targets, seed 42 and rebuilt
+neighborhoods, its mean ROC-AUC was **0.932188 ± 0.020985**; precision was
+0.060602 ± 0.020310 and recall 0.523810 ± 0.089087 at threshold 0.5. These results
+use a different population and graph context from the baseline, and preserve
+test-fold epoch selection; they do not establish an improvement over the baseline.
+All metrics, fold details, PyCharm instructions and unresolved preprocessing
+provenance are documented in the [new-data experiment guide](docs/brca_updated_data_experiment.md).
 
 ## Differences from original implementation
 

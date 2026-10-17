@@ -5,6 +5,12 @@ a new experiment; use `--output` to retain separate runs. Generated files are
 excluded from Git. Check the JSON's `status` before interpreting results:
 `running`, `complete`, `failed`, or `interrupted`.
 
+The separate `configs/brca_updated_data.yaml` experiment writes
+`brca_updated_data_metrics.json`. It uses all 16,786 newly prepared genes and
+rebuilt neighborhoods with the same model/training settings. Its population and
+graph context differ from the baseline; interpret it as a distinct experiment.
+See [its guide and provenance limits](../docs/brca_updated_data_experiment.md).
+
 `scripts/smoke_test.py` writes `brca_smoke_metrics.json` separately. It runs only
 12 real targets, two epochs per fold, batch size 4, and three folds on CPU; the
 `smoke_test` field identifies its limited scope. Do not use its scores as a full
