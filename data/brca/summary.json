@@ -1,0 +1,104 @@
+{
+  "profile": "authors_pinned_input_snapshot",
+  "mutation": {
+    "indexed_rows": 90586,
+    "variant_rows": 90586,
+    "retained_effect_annotations": 654261,
+    "retained_variant_rows": 90558,
+    "unresolved_variant_rows": 28,
+    "mutation_samples": 985,
+    "mutation_genes_before_expression_join": 16869,
+    "maf_header": [
+      "#version gdc-1.0.0",
+      "#filedate 20170929",
+      "#annotation.spec gdc-1.0.1-public",
+      "#n.analyzed.samples 986"
+    ],
+    "genome_builds": [
+      "GRCh38"
+    ]
+  },
+  "expression_gene_rows": 19456,
+  "expression_sample_groups": {
+    "normal": 6,
+    "tumor": 94
+  },
+  "expression_unit": "author_supplied_scale_not_documented",
+  "expression_transform": "identity",
+  "mutation_expression_shared_tumor_samples": 85,
+  "cohorts_matched_for_aggregation": false,
+  "genes_missing_expression": 83,
+  "exported_gene_rows": 16786,
+  "full_schema_exported": true,
+  "mutation_count_standardization": {
+    "mean": 3.34070058381985,
+    "std": 5.258334000309461,
+    "ddof": 1,
+    "gene_count": 16786
+  },
+  "ppi": {
+    "lls_threshold_exclusive": 3.211,
+    "mutation_quartile_floor": 4,
+    "retained_edge_rows": 31698,
+    "non_ensembl_endpoint_values": [
+      "GARIN1A",
+      "GARIN2",
+      "GARIN3",
+      "GARIN4",
+      "GARIN6",
+      "LOC102723553",
+      "LOC102724023",
+      "LOC102724428",
+      "LOC102724652",
+      "LOC118142757",
+      "PHB1",
+      "PIERCE1",
+      "PIERCE2",
+      "PPP5D1P",
+      "RIMOC1"
+    ],
+    "neighbor_policy": "Only neighbors present in the feature context contribute, following upstream",
+    "standardization": {
+      "mean": 0.7455617776718694,
+      "std": 1.683866466375068,
+      "ddof": 1,
+      "gene_count": 16786
+    }
+  },
+  "pathway_standardization": {
+    "mean": 0.07738591683545812,
+    "std": 0.3354246899250324,
+    "ddof": 1,
+    "gene_count": 16786
+  },
+  "mapping_status_symbols": {
+    "ensembl_release_unique": 16175,
+    "authors_fallback": 703,
+    "ambiguous_excluded": 6
+  },
+  "provenance_limits": [
+    "Authors' expression matrix contains a subset of samples; it does not establish the full paper cohort.",
+    "The default author expression unit is undocumented; values are processed without another transformation.",
+    "Ambiguous symbol mappings are excluded; exact SO matching replaces upstream substring/set-order matching.",
+    "No claim of raw-to-shipped-CSV identity or calibrated driver probabilities."
+  ],
+  "pathways": {
+    "direct_pathway": "hsa05224",
+    "related_pathway_count": 8,
+    "hgnc_snapshot": "2026-10-06",
+    "mapped_candidate_genes": 1117,
+    "direct_genes_in_feature_table": 136,
+    "mapping_status_memberships": {
+      "mapped": 1558,
+      "unmapped": 4
+    }
+  },
+  "labels": {
+    "supplied_positive_genes": 42,
+    "positives_in_feature_table": 42,
+    "positives_missing_from_features": [],
+    "unlabelled_feature_genes": 16744,
+    "interpretation": "Absence from the supplied positive list means unlabelled, not a confirmed non-driver",
+    "used_in_feature_construction": false
+  }
+}

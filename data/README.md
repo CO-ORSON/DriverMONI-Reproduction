@@ -1,109 +1,155 @@
 # BRCA input data
 
-Datasets are excluded from Git. This workspace has local copies of the required
-BRCA files in `data/upstream/`. For another checkout, use the processed data from
-revision `ddb0a830158ba41c90019bd5ca92054c2ba0869b` of
-[DriverMONI](https://github.com/BML-cbnu/DriverMONI/tree/ddb0a830158ba41c90019bd5ca92054c2ba0869b).
-Raw mutation/expression preprocessing is outside this stage.
+Two independent workflows are available: **reproduce the original benchmark**
+using the authors' processed inputs, or **generate a canonical dataset** from
+retrieved raw/reference sources. The training loader currently uses the original
+benchmark inputs; canonical generation does not switch its configuration.
+The canonical BRCA feature dataset is available at `data/brca/BRCA_input_data.csv`. The linked driver-evidence and gene-status tables are available under `data/brca_driver_evidence/`.
 
-## Obtain the inputs
+## Generate the canonical BRCA dataset
 
-No redistribution license was found in the pinned authors' repository. We do not
-bundle these files or claim permission to redistribute them. Download them directly
-from the authors; see [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md). Do not
-force-add the data directory to Git or send a ZIP containing these local files.
+The new source-preparation workflow replaces **hard-coded gene and pathway
+membership lists** with retrieved source tables and explicit identifier mappings.
+It records **feature-to-source mapping**, formulas, mapping versions and checksums
+so acquisition and raw-to-feature processing can be reproduced and audited.
 
-From a fresh reproduction checkout, after activating its environment:
+From the reproduction root, using Python 3.10+ and the standard library:
 
 ```bash
-git -c core.autocrlf=false clone https://github.com/BML-cbnu/DriverMONI.git data/upstream
-git -C data/upstream checkout --detach ddb0a830158ba41c90019bd5ca92054c2ba0869b
-python -m scripts.debug_brca --data-root data/upstream --gene ENSG00000012048
-python scripts/run_brca.py --config configs/brca.yaml
+python3 scripts/preprocess_brca.py
 ```
 
-If `data/upstream/` already contains the files, skip cloning. For an existing
-upstream checkout elsewhere, supply `--data-root /absolute/path/to/DriverMONI`
-to the debug, experiment, and smoke-test commands. You do not need to copy it.
-The clone command disables line-ending conversion so optional source-hash parity
-checks also see the original file bytes on platforms that default to CRLF.
+[brca_preprocessing.json](../configs/brca_preprocessing.json) selects the source
+configs, cache and output directory. The command acquires its own inputs;
+cloning the benchmark repository is unnecessary for this workflow.
 
-Alternatively, obtain just the following files from the pinned GitHub links
-(use **Raw / Download raw file** on each file page), creating the listed directories
-under `data/upstream/`. The ZIP is used in place of an extracted edge CSV:
-
-| Download from the authors | Place below `data/upstream/` |
+| Feature family | Current source |
 | --- | --- |
-| [BRCA features](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_preprocessed_file/BRCA_input_data.csv) | `sample_preprocessed_file/BRCA_input_data.csv` |
-| [BRCA labels](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv) | `using_Data/BRCA_label.csv` |
-| [Comparison genes](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_concat_data/after_concat_BRCA_genes2.csv) | `for_concat_data/after_concat_BRCA_genes2.csv` |
-| [Gene annotations](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/gene_info_for_GOSemSim.csv) | `gene_info_for_GOSemSim.csv` |
-| [HumanNet archive](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip) | `for_ref/humannet_v2_and_v3.zip` |
-| [BRCA neighbor cache](https://github.com/BML-cbnu/DriverMONI/blob/ddb0a830158ba41c90019bd5ca92054c2ba0869b/PPI_graph/gene_n_humannet_BRCA.pickle) | `PPI_graph/gene_n_humannet_BRCA.pickle` |
+| Nine mutation features | Authors' pinned VarScan MAF, Ensembl 102 annotation and author reference tables. |
+| Expression (`deg`) | Authors' pinned BRCA expression matrix. |
+| KEGG (`dir_pathway`, `related_pathway`) | Retrieved breast-cancer and related-pathway memberships, mapped through dated HGNC cross-references. |
+| HumanNet (`PPI`) | Authors' pinned mapped HumanNet v3 network; its edges also supply the GAT graphs. |
 
-The data-only option supports training and the smoke command. Original-source
-parity tests additionally need `CV_multimodal_compare.py` and
-`torch_models_linear.py` at the root of a separately acquired pinned checkout.
+Ensembl 102 maps mutation symbols; the dated HGNC table maps KEGG/NCBI IDs and
+is not an Ensembl-102 reconstruction. Labels are audited separately and do not
+select genes or enter feature construction. The default expression example has
+94 tumors and six normals; its units and equivalence to the full study cohort
+remain undocumented.
 
-## Required schema
-
-The loader expects these paths below the supplied `upstream_root`. The debug
-command accepts this root via `--data-root` and defaults to `data/upstream/`:
-
-| Relative path | Purpose |
+| Output | Purpose |
 | --- | --- |
-| `sample_preprocessed_file/BRCA_input_data.csv` | Gene identifiers and 13 numeric features. |
-| `using_Data/BRCA_label.csv` | Positive Ensembl IDs in the `gene_label` column. |
-| `for_concat_data/after_concat_BRCA_genes2.csv` | Default comparison-gene list. |
-| `gene_info_for_GOSemSim.csv` | Symbol whitelist used by the default filter. |
-| `for_ref/humannetv3_ens_ppi.csv` | Unfiltered HumanNet v3 edge table. |
-| `PPI_graph/gene_n_humannet_BRCA.pickle` | Supplied one-hop neighbor lists. |
+| `data/brca/BRCA_input_data.csv` | Combined mutation, expression, KEGG and PPI features in the existing schema. |
+| `data/brca/audit/`, `data/brca/references/` | Raw counts, group means, samples, mapping/exclusion audits, label coverage and pathway evidence. |
+| `data/brca/manifest.json`, `data/brca/summary.json` | Source URLs, checksums, configuration, formulas, mapping versions and coverage. |
+| `data/cache/` | Shared download cache, including the mapped HumanNet ZIP. |
 
-The edge CSV is inside `for_ref/humannet_v2_and_v3.zip`, under the archive member
-`humannet_v2_and_v3/humannetv3_ens_ppi.csv`. The loader can read this member directly
-without extraction when the standalone CSV is absent. It does not modify the
-authors' checkout or write regenerated neighbor caches to it.
-The upstream endpoint columns are named `entrez_id_1` and `entrez_id_2`, but the
-bundled values are Ensembl IDs. Preserve the CSV's edge orientation.
+Replay the recorded source snapshots without network access:
 
-## Feature order
+```bash
+python3 scripts/preprocess_brca.py --offline --lock-manifest data/brca/manifest.json
+```
 
-The DNN columns, in order, are:
+The lock verifies source URLs and checksums. Optional modality diagnostics write
+under `data/diagnostics/`; historical datasets and receipts are in `data/history/`.
+See [BRCA source preparation](../docs/brca_source_preparation.md) for source links,
+formula details, overrides and synthetic/real-source replay tests.
 
-1. `synonymous_variant`
-2. `stop_gained`
-3. `missense_variant`
-4. `frameshift_variant`
-5. `splice`
-6. `inframe`
-7. `lost_stop and start`
-8. `deg`
-9. `related_pathway`
-10. `dir_pathway`
-11. `muta_count`
-12. `miss_ratio`
+## Cancer-genomics purpose of the features
 
-GAT node features append `PPI` as column 13. Gene identifiers, target masks, and
-labels are not feature columns. Keep processed values unchanged.
+These features combine evidence of altered coding sequence, transcription,
+known cancer mechanisms and network context. They support driver prediction;
+none alone establishes that a gene drives BRCA.
 
-## Validation expectations
+1. **Mutation consequences and recurrence (nine features).** Seven consequence
+   proportions describe potential functional changes: stop-gained and frameshift
+   mutations can impair protein function; missense and inframe mutations can alter
+   activity; splice-region mutations may affect RNA processing; and start/stop-loss
+   mutations can alter translation initiation or termination. Synonymous mutations
+   provide a protein-sequence-preserving comparison, although they are not always
+   neutral ([Ensembl definitions](https://static.ensembl.org/info/genome/variation/prediction/predicted_data.html)).
+   `miss_ratio` contrasts missense with synonymous substitutions. `muta_count`
+   represents standardized recurrence across **distinct tumor samples** with at
+   least one `stop_gained`, `missense_variant`, `frameshift_variant` or
+   `splice_region_variant` annotation; each sample counts once. Together, these
+   features inform driver prediction through functional consequences and
+   recurrence, without establishing that individual mutations are drivers.
+2. **Expression (`deg`).** Transcript abundance captures tumor-associated
+   dysregulation that mutations alone miss, including regulatory and
+   copy-number effects.
+   `deg` represents the direction and magnitude of the tumor–normal expression
+   contrast. It adds transcriptional context, rather than establishing a causal
+   driver mechanism or statistically significant differential expression.
+3. **Pathway membership (`dir_pathway`, `related_pathway`).** KEGG supplies prior
+   biological context for breast-cancer signaling, hormone response, cell-cycle
+   control and DNA repair ([BRCA map](https://www.kegg.jp/entry/path%3Ahsa05224)).
+   `dir_pathway` marks involvement in the breast-cancer map; `related_pathway`
+   represents participation across related biological modules. These features
+   help place alterations in known mechanisms. Membership does not measure
+   pathway activation, and absent annotation does not exclude a novel driver.
+4. **Network context (`PPI` and GAT).** Cancer mechanisms involve gene modules,
+   so network neighbors add context beyond a gene's own alterations. HumanNet
+   includes physical and functional association networks; its edges should not
+   automatically be interpreted as direct protein binding
+   ([HumanNet v3](https://pmc.ncbi.nlm.nih.gov/articles/PMC8728227/)). The scalar
+   `PPI` feature emphasizes connections to recurrently mutated genes, providing
+   mutation-conditioned network context. The GAT learns from neighboring genes'
+   multiomics features. Neither network proximity nor mutation recurrence alone
+   proves driver status.
 
-The inspected BRCA table contains 16,875 genes. Applying the upstream comparison
-filter leaves 15,028 target genes, including 42 positives. Treat these as checks
-against the pinned inputs, not as universal constants for other datasets.
+The model combines a gene's own features through the DNN with neighborhood
+information through the GAT. See [BRCA source preparation](../docs/brca_source_preparation.md)
+for calculation methods and [data sources](../docs/data_sources.md) for provenance
+and remaining limitations.
 
-Preserve the supplied neighbor cache by default: inspection found five empty
-BRCA entries despite network neighbors being available. Cache regeneration changes
-those graph inputs and must be recorded explicitly. Cache deserialization should
-accept only the expected dictionary/list/string content.
+## Canonical versus original BRCA features
 
-The loader fails clearly on missing files, incompatible gene IDs, nonfinite
-features, or missing target cache entries. Record file checksums before training.
-Large inputs are excluded by `.gitignore`.
+Both CSVs have the same two identifiers and 13 features. The original contains
+**16,875 genes**, the canonical file **16,786**, with **16,783 shared genes**
+and all **42 supplied positives** retained. There are 92 original-only IDs and
+three canonical-only IDs. Population changes include 83 genes without expression
+under their mapped IDs, six ambiguous symbol mappings, and additional ID changes.
 
-`GeneSample` returns `gene_features`, `graph`, scalar integer `label`, `gene_id`,
-and `node_gene_ids` in graph-node order. The graph stores `feat` [N,13],
-`is_target` [N] (boolean), and `global_node_id` [N]. Labels are never node features.
-`collate_gene_samples` returns `GeneBatch`; `.to(device)` moves features, graph,
-and labels together. Restrict `target_gene_ids` when creating fold datasets while
-retaining the full filtered table as the feature context.
+Comparisons below align shared Ensembl IDs; differences below `1e-10` count as
+numerical agreement.
+
+| Feature | Comparison and explanation |
+| --- | --- |
+| Seven mutation proportions and `miss_ratio` | Agree for every shared gene. |
+| `muta_count` | Raw affected-sample counts agree; z-scores differ slightly because the normalization population changes. |
+| `deg` | 16,748 shared genes differ (correlation 0.611). Canonical values use 94 tumors and six normals; the original CSV's exact expression cohort, scale and processing history remain unresolved. |
+| `dir_pathway` | Identical for shared genes. Total direct members fall from 137 to 136 because FGF23 is excluded. |
+| `related_pathway` | Raw counts change for 449 shared genes through PI3K–Akt deduplication and refreshed KEGG/HGNC membership; all z-scores change. |
+| `PPI` | Same network and threshold; 46 shared genes lose one qualifying neighbor. Population changes also alter all PPI z-scores. |
+
+Five retained genes have different displayed symbols, affecting the original
+symbol whitelist. The current loader also rejects direct substitution because
+its comparison list requests 84 IDs absent from the canonical file. Treat the
+canonical export as a separate dataset version; use the original processed CSV
+for strict benchmark reproduction. Matching schemas do not establish identical
+feature values or model results.
+
+## Review BRCA driver evidence
+
+`python3 scripts/prepare_brca_driver_evidence.py --offline` builds two linked
+tables under `data/brca_driver_evidence/`: source assertions and per-gene review
+status. It combines public OncoKB exports, IntOGen BRCA cohort calls and reviewed
+literature. As the full CGC export is unavailable, the **42 DriverMONI labels**
+serve as the **paper-attributed CGC v95 subset**, with extraction rules and tiers
+marked unverified. Benchmark labels/features remain unchanged; unresolved genes
+are not confirmed negatives. Sources, mappings, cohort overlap and mechanism
+coverage are recorded. See [driver evidence](../docs/brca_driver_evidence.md)
+for qualifications, status rules and replay/validation instructions.
+
+## Shared feature schema
+
+[src/feature_schema.py](../src/feature_schema.py) defines the DNN feature order:
+
+```text
+synonymous_variant, stop_gained, missense_variant, frameshift_variant,
+splice, inframe, lost_stop and start, deg, related_pathway, dir_pathway,
+muta_count, miss_ratio
+```
+
+GAT node features append `PPI` as feature 13. Gene identifiers and labels are
+separate from numeric features. Sharing this schema does not establish benchmark
+parity; input populations, values and graph context must also agree.

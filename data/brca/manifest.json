@@ -1,0 +1,542 @@
+{
+  "schema_version": 2,
+  "created_at": "2026-10-12T17:39:52.971625+00:00",
+  "configuration": {
+    "pipeline": {
+      "omics_config": "configs/brca_omics_sources.json",
+      "pathway_config": "configs/brca_sources.json",
+      "cache_dir": "data/cache",
+      "output_dir": "data/brca",
+      "network": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+        "format": "zip",
+        "member": "humannet_v2_and_v3/humannetv3_ens_ppi.csv",
+        "mapping": "Authors' mapped HumanNet v3; retain supplied endpoint IDs and report non-Ensembl values"
+      },
+      "labels": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+        "format": "text"
+      }
+    },
+    "omics": {
+      "profile": "authors_pinned_input_snapshot",
+      "upstream_commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b",
+      "cache_dir": "data/cache",
+      "output_dir": "data/diagnostics/omics",
+      "sources": {
+        "mutation": {
+          "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_mutation.zip",
+          "format": "zip",
+          "member": "BRCA.varscan.maf",
+          "workflow": "Authors' TCGA BRCA VarScan MAF; historical GDC version in header"
+        },
+        "expression": {
+          "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_expression.zip",
+          "format": "zip",
+          "member": "BRCA-gene-exp.tsv",
+          "unit": "author_supplied_scale_not_documented",
+          "transform": "identity"
+        },
+        "annotation": {
+          "url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+          "format": "gzip",
+          "release": 102,
+          "assembly": "GRCh38"
+        },
+        "protein_filter": {
+          "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/hsa_id_conv.txt",
+          "format": "text",
+          "annotation_release": "Not documented by authors"
+        },
+        "fallback_mapping": {
+          "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/gene_ensembl_mapping.pickle",
+          "format": "pickle"
+        },
+        "consequence_terms": {
+          "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/soterm_list.txt",
+          "format": "text"
+        }
+      },
+      "expression_tumor_codes": [
+        "01"
+      ],
+      "expression_normal_codes": [
+        "11"
+      ],
+      "gene_mapping_policy": "unique_ensembl_release_symbol_then_authors_fallback",
+      "mutation_consequence_policy": "all_effects_exact_terms_keep_transcript_multiplicity",
+      "mutation_filter_policy": "as_supplied_no_additional_filter",
+      "cohort_policy": "independent_mutation_and_expression_cohorts",
+      "missing_expression_policy": "exclude_and_report"
+    },
+    "pathways": {
+      "pathway_name": "Breast cancer",
+      "hgnc_snapshot": "2026-10-06",
+      "cache_dir": "data/cache",
+      "output_dir": "data/diagnostics/pathways"
+    }
+  },
+  "sources": [
+    {
+      "url": "https://rest.kegg.jp/list/pathway/hsa",
+      "resolved_url": "https://rest.kegg.jp/list/pathway/hsa",
+      "retrieved_at": "2026-10-12T15:12:17.368850+00:00",
+      "sha256": "345290b203a665fa7604f36ba51d78095a712c6c02820fb09fde82a5a90c0a3a",
+      "bytes": 22117,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/list/pathway/hsa",
+      "specification": {
+        "url": "https://rest.kegg.jp/list/pathway/hsa",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/get/hsa05224",
+      "resolved_url": "https://rest.kegg.jp/get/hsa05224",
+      "retrieved_at": "2026-10-12T15:12:18.219016+00:00",
+      "sha256": "46dc042dfb35d7c74bcff3399d0811de846e56c524b44029daffbd5bb3cb326c",
+      "bytes": 25431,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/get/hsa05224",
+      "specification": {
+        "url": "https://rest.kegg.jp/get/hsa05224",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa05224",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa05224",
+      "retrieved_at": "2026-10-12T15:12:18.710457+00:00",
+      "sha256": "6868a088d8388d05c0716919e36f1a3487554900ef545da26e30b673ad01cb9d",
+      "bytes": 3429,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa05224",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa05224",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa03440",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa03440",
+      "retrieved_at": "2026-10-12T15:12:19.200483+00:00",
+      "sha256": "0f45e8df5cba5cb1c98e6c31a1507e59c5fd5fc126b3b4f05258004ebd42433a",
+      "bytes": 3249,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa03440",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa03440",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04010",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04010",
+      "retrieved_at": "2026-10-12T15:12:19.684616+00:00",
+      "sha256": "eaba7621abeb6169843fe4425b663b1478296d2a9cff744b7b0d480425621599",
+      "bytes": 6951,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04010",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04010",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04110",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04110",
+      "retrieved_at": "2026-10-12T15:12:20.099053+00:00",
+      "sha256": "1c214a9a977cbe0a61060df42ebecd82816056e016288bd9f0462427c934378d",
+      "bytes": 3664,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04110",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04110",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04115",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04115",
+      "retrieved_at": "2026-10-12T15:12:20.501841+00:00",
+      "sha256": "0c489b3922077b46dd702f0e94d8c3cf1c07659f224d7157750e5096ed9f1e48",
+      "bytes": 1729,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04115",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04115",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04151",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04151",
+      "retrieved_at": "2026-10-12T15:12:20.914665+00:00",
+      "sha256": "d4e301ccca441d39a5ff754ab04f5a4e8240cca0cd013a8bc31123d525b4481e",
+      "bytes": 8387,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04151",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04151",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04310",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04310",
+      "retrieved_at": "2026-10-12T15:12:21.324365+00:00",
+      "sha256": "ae2c547dfb8f74d6f85e5e0233d7740269735ae0190905a9790a6c31c2c5e6ca",
+      "bytes": 4165,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04310",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04310",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04330",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04330",
+      "retrieved_at": "2026-10-12T15:12:21.732563+00:00",
+      "sha256": "ba57dbe47aa88832c26706ac9b69cd6665383fbb93c72329f25ac3d4d64a840b",
+      "bytes": 1486,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04330",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04330",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://rest.kegg.jp/link/hsa/hsa04915",
+      "resolved_url": "https://rest.kegg.jp/link/hsa/hsa04915",
+      "retrieved_at": "2026-10-12T15:12:22.176888+00:00",
+      "sha256": "aaa189783029d43159ab685ec79a4b740b535e3a1a1de9430d40eeed8d2eb322",
+      "bytes": 3226,
+      "last_modified": null,
+      "etag": null,
+      "role": "https://rest.kegg.jp/link/hsa/hsa04915",
+      "specification": {
+        "url": "https://rest.kegg.jp/link/hsa/hsa04915",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+      "resolved_url": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+      "retrieved_at": "2026-10-12T15:12:26.272040+00:00",
+      "sha256": "8bf6f686e640dbc864a346484626953621b0500d900d26cd085a35c2782d725d",
+      "bytes": 16973125,
+      "last_modified": "Tue, 06 Oct 2026 13:38:26 GMT",
+      "etag": "\"af43fd56a64ad57c0fcc72d6ef65e516\"",
+      "role": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+      "specification": {
+        "url": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_mutation.zip",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_mutation.zip",
+      "sha256": "cdd1dea5ffdefce8fe703b62312f191b5872540f2e19322a6fdada1904563d64",
+      "bytes": 24149391,
+      "retrieved_at": "2026-10-12T16:44:45.770170+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"b05066a1b8a05bbb7ed59b478741daa405fc1067847de753ad3e64e2c86b7834\"",
+      "role": "mutation",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_mutation.zip",
+        "format": "zip",
+        "member": "BRCA.varscan.maf",
+        "workflow": "Authors' TCGA BRCA VarScan MAF; historical GDC version in header"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_expression.zip",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_expression.zip",
+      "sha256": "dd3970aac1a474daf22b2a1e23f14ebf7542157a16549daf12ad2a597599bf1e",
+      "bytes": 15137726,
+      "retrieved_at": "2026-10-12T16:44:47.176798+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"527b722d5609ae7192ea45da61b2d4b75f9100d65a096268a930afbd3a2519b0\"",
+      "role": "expression",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/sample_data/sample_data_expression.zip",
+        "format": "zip",
+        "member": "BRCA-gene-exp.tsv",
+        "unit": "author_supplied_scale_not_documented",
+        "transform": "identity"
+      }
+    },
+    {
+      "url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+      "resolved_url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+      "sha256": "307038294611aaf86c3e61e70273a26c7b3a343cd416feed137e6e86d471ea32",
+      "bytes": 48295448,
+      "retrieved_at": "2026-10-12T16:45:08.970024+00:00",
+      "acquisition": "download",
+      "last_modified": "Sat, 24 Oct 2020 03:32:20 GMT",
+      "etag": "\"2e0ee18-5b26258359900\"",
+      "role": "annotation",
+      "specification": {
+        "url": "https://ftp.ensembl.org/pub/release-102/gtf/homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz",
+        "format": "gzip",
+        "release": 102,
+        "assembly": "GRCh38"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/hsa_id_conv.txt",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/hsa_id_conv.txt",
+      "sha256": "dfd55b4f337087b74b71976059f116a0936c5639dded189e20b9bcebf70c009d",
+      "bytes": 3078194,
+      "retrieved_at": "2026-10-12T16:45:09.542377+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"9d5926d8f12631da3582816550bf0355df7244bbd7ac05adba1f65ac96045103\"",
+      "role": "protein_filter",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/hsa_id_conv.txt",
+        "format": "text",
+        "annotation_release": "Not documented by authors"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/gene_ensembl_mapping.pickle",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/gene_ensembl_mapping.pickle",
+      "sha256": "7940f4cc6ab7bb76def873743063b41daaca73975bfdeaa120d03795ae722f0b",
+      "bytes": 1185396,
+      "retrieved_at": "2026-10-12T16:45:10.067062+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"3d6b4094282ddddbcaf97300cae410a81d1735be2bafa16e5962397b0fabbb87\"",
+      "role": "fallback_mapping",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/gene_ensembl_mapping.pickle",
+        "format": "pickle"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/soterm_list.txt",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/soterm_list.txt",
+      "sha256": "b1ca819e0819212f1ea3c41e8495ef4eb208921be480944961b7b94412afd9d6",
+      "bytes": 5131,
+      "retrieved_at": "2026-10-12T16:45:10.384576+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"538e467124bc5e8cd3392c23fdd99641613e54e7c29f93072c09f74c95183ad7\"",
+      "role": "consequence_terms",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/soterm_list.txt",
+        "format": "text"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+      "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51",
+      "bytes": 9768702,
+      "retrieved_at": "2026-10-12T17:39:51.976545+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"2c8afc78c197453ac6a8cd76e48bb38296e0aa6d8a39366f125fabb94456622b\"",
+      "role": "network_edges",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+        "format": "zip",
+        "member": "humannet_v2_and_v3/humannetv3_ens_ppi.csv",
+        "mapping": "Authors' mapped HumanNet v3; retain supplied endpoint IDs and report non-Ensembl values"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+      "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9",
+      "bytes": 843,
+      "retrieved_at": "2026-10-12T17:39:53.343965+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"a0627ec921af19acffc3dd9560a29dd219a2f66762b0c1c9a9622da0e3f2a7b8\"",
+      "role": "supplied_positive_labels",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+        "format": "text"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+      "resolved_url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+      "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51",
+      "bytes": 9768702,
+      "retrieved_at": "2026-10-12T17:39:51.976545+00:00",
+      "acquisition": "download",
+      "last_modified": null,
+      "etag": "\"2c8afc78c197453ac6a8cd76e48bb38296e0aa6d8a39366f125fabb94456622b\"",
+      "role": "network_edges",
+      "specification": {
+        "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+        "format": "zip",
+        "member": "humannet_v2_and_v3/humannetv3_ens_ppi.csv",
+        "mapping": "Authors' mapped HumanNet v3; retain supplied endpoint IDs and report non-Ensembl values"
+      }
+    }
+  ],
+  "full_schema_exported": true,
+  "annotation_gene_records": 60675,
+  "implementation": {
+    "python": "3.13.5",
+    "feature_code_sha256": "96500272a61726585927cb504292537f0450915ea958a6344503214575cf5e78",
+    "acquisition_code_sha256": "0179bd9132a36af31a926cb2e85bb03c39416cf69efc2c2384d704c451c90c0d",
+    "pathway_code_sha256": "f05652d320f389e8a3cb7d6dd5ce31c987481acdbb112944e215e58ee619fd57",
+    "shared_schema_code_sha256": "b4df5e76f2fd55a1adf744d67553cb8a0e0abdf98744218676688fae8f544e47",
+    "common_code_sha256": "9608f65b61a72124798f9afa2e44f660274bd77c4024d4bcc493c970d469d447",
+    "pipeline_code_sha256": "77f0546d6640c274fa0104302247e148db3f315750b7a5efab03713016a6f2d4"
+  },
+  "formulas": {
+    "mutation_proportions": "all_effects category annotation counts / all retained consequence annotations for that gene",
+    "splice": "splice_region_variant only, following upstream",
+    "muta_count": "distinct tumor sample-gene groups with any selected deleterious annotation; z-score after expression join, ddof=1",
+    "miss_ratio": "missense / (missense + synonymous); zero for zero denominator",
+    "deg": "mean(tumor input values after configured transform) - mean(normal input values after configured transform)",
+    "no_labels_in_features": true
+  },
+  "outputs": [
+    {
+      "file": "BRCA_input_data.csv",
+      "sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c"
+    },
+    {
+      "file": "audit/gene_counts.csv",
+      "sha256": "39c64c46857f4538b95d5e64f2a3c848de3832dfd8f6bbeec370adb2bec11a47"
+    },
+    {
+      "file": "audit/expression_means.csv",
+      "sha256": "8e6d8732154f83f1a8221d50435df124a8192904bcfd9b1f106a62ce3c274ac8"
+    },
+    {
+      "file": "audit/samples.csv",
+      "sha256": "23f7d0c246a0a99549976f03b102a1a38f5cc9c083df912dfea993c1c3dd5f79"
+    },
+    {
+      "file": "audit/mutation_mapping.csv",
+      "sha256": "bfc1ce36491e3ec8eabd33d0f15fc81a201f906a7c4c617007e0b3dedd39c751"
+    },
+    {
+      "file": "audit/excluded_genes.csv",
+      "sha256": "451c97e813b63963e2b54a379a73bbe787f8fde0054f016652a9b7dfedf23dfd"
+    },
+    {
+      "file": "summary.json",
+      "sha256": "186a6ccc3a34f62c57290999b8bbcb827bb4aebc3d740154dcc9ad47d9cd8a5d"
+    },
+    {
+      "file": "references/pathway_selection.json",
+      "sha256": "758f9c1d80c5a1f7673c92ce59f5060ede8eabaad48f023f6ee4756397cc420b"
+    },
+    {
+      "file": "references/pathway_gene_membership.csv",
+      "sha256": "031bf2a9a4963027147213799603c5058d390fd90df5f57cf62cbe91bdbf5a9a"
+    },
+    {
+      "file": "audit/pathway_mapping.csv",
+      "sha256": "6c71f4af343349761564b9f8e999ce83ee8c716c93c79300d750bc6478f34237"
+    },
+    {
+      "file": "audit/driver_label_comparison.csv",
+      "sha256": "0b49b20329389d8036b3fc5e5f5d0c54f5b0dbb1bc0cf406a651e736e07af51b"
+    }
+  ],
+  "cancer": "BRCA",
+  "feature_schema": [
+    "gene_ens",
+    "gene_symbol",
+    "synonymous_variant",
+    "stop_gained",
+    "missense_variant",
+    "frameshift_variant",
+    "splice",
+    "inframe",
+    "lost_stop and start",
+    "deg",
+    "related_pathway",
+    "dir_pathway",
+    "muta_count",
+    "miss_ratio",
+    "PPI"
+  ],
+  "mapping_versions": {
+    "mutation_symbols": {
+      "provider": "Ensembl GTF",
+      "release": 102
+    },
+    "kegg_ncbi_to_ensembl": {
+      "provider": "HGNC dated archive",
+      "snapshot": "2026-10-06",
+      "url": "https://storage.googleapis.com/public-download-files/hgnc/archive/archive/monthly/tsv/hgnc_complete_set_2026-10-06.txt",
+      "ensembl_release": "Not specified by HGNC"
+    },
+    "network": "Authors' pre-mapped HumanNet; original conversion provenance is not fully supplied"
+  },
+  "pathway_selection": {
+    "query": "Breast cancer",
+    "pathway_id": "hsa05224",
+    "name": "Breast cancer",
+    "rationale": "Unique exact disease-name match in the retrieved Homo sapiens pathway catalogue; labels were not used.",
+    "related_pathways": [
+      {
+        "pathway_id": "hsa03440",
+        "name": "Homologous recombination"
+      },
+      {
+        "pathway_id": "hsa04010",
+        "name": "MAPK signaling pathway"
+      },
+      {
+        "pathway_id": "hsa04110",
+        "name": "Cell cycle"
+      },
+      {
+        "pathway_id": "hsa04115",
+        "name": "p53 signaling pathway"
+      },
+      {
+        "pathway_id": "hsa04151",
+        "name": "PI3K-Akt signaling pathway"
+      },
+      {
+        "pathway_id": "hsa04310",
+        "name": "Wnt signaling pathway"
+      },
+      {
+        "pathway_id": "hsa04330",
+        "name": "Notch signaling pathway"
+      },
+      {
+        "pathway_id": "hsa04915",
+        "name": "Estrogen signaling pathway"
+      }
+    ]
+  },
+  "policies": {
+    "join": "Mutation genes with expression; keep zero-membership genes; no label-based filtering",
+    "related_pathways": "Distinct retrieved REL_PATHWAY identifiers, excluding the direct pathway",
+    "mapping": "Require one approved HGNC Ensembl ID and symbol per NCBI Gene ID; report exclusions",
+    "standardization": "ddof=1 over the final mutation-expression gene universe",
+    "network": "LLS > 3.211; retain edge multiplicity; only feature-bearing neighbors contribute to PPI",
+    "labels": "Supplied positives audited separately; remaining genes unlabelled"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "omics_config": "configs/brca_omics_sources.json",
+  "pathway_config": "configs/brca_sources.json",
+  "cache_dir": "data/cache",
+  "output_dir": "data/brca",
+  "network": {
+    "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/for_ref/humannet_v2_and_v3.zip",
+    "format": "zip",
+    "member": "humannet_v2_and_v3/humannetv3_ens_ppi.csv",
+    "mapping": "Authors' mapped HumanNet v3; retain supplied endpoint IDs and report non-Ensembl values"
+  },
+  "labels": {
+    "url": "https://raw.githubusercontent.com/BML-cbnu/DriverMONI/ddb0a830158ba41c90019bd5ca92054c2ba0869b/using_Data/BRCA_label.csv",
+    "format": "text"
+  }
+}

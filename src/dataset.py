@@ -12,17 +12,12 @@ from torch import Tensor
 from torch.utils.data import Dataset
 
 from .graph_utils import PPIGraph, load_humannet_edges, load_neighbor_cache
+from .feature_schema import DNN_FEATURES, GAT_FEATURES
 
 
 # Exact order: CV_multimodal_compare.py, __getitem__ line 513 and
 # _prepare_subgraphs line 460 at ddb0a830158ba41c90019bd5ca92054c2ba0869b.
 # 'deg' is differential expression, not graph degree. No re-scaling is applied.
-DNN_FEATURES: tuple[str, ...] = (
-    "synonymous_variant", "stop_gained", "missense_variant", "frameshift_variant",
-    "splice", "inframe", "lost_stop and start", "deg", "related_pathway",
-    "dir_pathway", "muta_count", "miss_ratio",
-)
-GAT_FEATURES: tuple[str, ...] = DNN_FEATURES + ("PPI",)
 assert len(DNN_FEATURES) == 12
 assert len(GAT_FEATURES) == 13
 

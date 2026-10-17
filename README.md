@@ -4,8 +4,9 @@
 
 Reproduce the authors’ **BRCA** model architecture, processed-data graph inputs,
 training, three-fold cross-validation, and evaluation in a readable Python project.
-This is a group-project reimplementation, not an official release. Raw TCGA
-preprocessing, other cancers, and algorithm improvements are outside this stage.
+This is a group-project reimplementation, not an official release. The baseline
+uses supplied processed inputs; separate raw-input source preparation is
+documented below. Other cancers and algorithm improvements are outside this stage.
 
 ## Original paper and repository
 
@@ -22,9 +23,9 @@ precedence when it differs from the paper. See
 [REPRODUCTION_NOTES.md](REPRODUCTION_NOTES.md) for the component-by-component audit.
 
 No license or redistribution grant was found in the pinned original repository.
-Original source bodies, processed data, and the paper PDF are **not bundled in
-this Git project**. Optional parity tests read a separately obtained local source
-checkout. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and
+Original source bodies, author-supplied processed data, and the paper PDF are
+**not bundled in this Git project**. Optional parity tests read a separately
+obtained local source checkout. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and
 licensing status; this project does not grant rights to upstream materials.
 
 ## Model architecture
@@ -62,7 +63,12 @@ DriverMONI-Reproduction/
 ├── .gitignore
 ├── pytest.ini
 ├── configs/
-│   └── brca.yaml               # Verified defaults and explicit new settings
+│   ├── brca.yaml                      # Baseline training settings
+│   ├── brca_preprocessing.json        # Combined canonical dataset workflow
+│   ├── brca_omics_sources.json        # Mutation/expression sources and policies
+│   ├── brca_sources.json              # KEGG retrieval and HGNC snapshot
+│   ├── brca_driver_evidence.json      # Driver-evidence sources and output settings
+│   └── brca_reviewed_driver_assertions.json # Reviewed literature assertions
 ├── src/
 │   ├── __init__.py
 │   ├── models/
@@ -71,14 +77,27 @@ DriverMONI-Reproduction/
 │   │   ├── gat.py
 │   │   └── drivermoni.py
 │   ├── dataset.py             # Features, labels, samples, batching
+│   ├── feature_schema.py      # Shared feature order for preprocessing and loading
+│   ├── preprocessing/
+│   │   ├── __init__.py
+│   │   ├── acquisition.py          # Download cache and source locks
+│   │   ├── common.py               # Shared artifact/provenance utilities
+│   │   ├── brca.py                 # Combined raw-to-feature workflow
+│   │   ├── brca_omics.py           # Mutation, expression and scalar PPI features
+│   │   ├── brca_sources.py         # KEGG/HGNC retrieval and label coverage audit
+│   │   └── brca_driver_evidence.py # Linked source assertions and gene status
 │   ├── graph_utils.py         # PPI loading and ego graphs
 │   ├── train.py               # Training and three-fold CV
 │   ├── evaluate.py            # Scores and metrics
 │   └── utils.py               # Seeds, config, devices, provenance
 ├── scripts/
-│   ├── run_brca.py            # Full experiment
-│   ├── debug_brca.py          # Inspect graph inputs
-│   └── smoke_test.py          # Small real-data pipeline check
+│   ├── run_brca.py                    # Full benchmark experiment
+│   ├── debug_brca.py                  # Inspect graph inputs
+│   ├── smoke_test.py                  # Small real-data pipeline check
+│   ├── preprocess_brca.py             # Combined canonical BRCA export
+│   ├── preprocess_brca_omics.py       # Optional omics diagnostics
+│   ├── preprocess_brca_sources.py     # Optional pathway/label diagnostics
+│   └── prepare_brca_driver_evidence.py # Build linked evidence/status tables
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
@@ -90,21 +109,40 @@ DriverMONI-Reproduction/
 │   ├── test_training.py
 │   ├── test_portability.py
 │   ├── test_intermediate_parity.py
-│   └── test_source_audit.py
+│   ├── test_source_audit.py
+│   ├── test_brca_omics.py
+│   ├── test_brca_sources.py
+│   ├── test_brca_pipeline.py
+│   ├── test_brca_snapshot.py        # Optional cached-source replay
+│   └── test_brca_driver_evidence.py
 ├── docs/
 │   ├── graph_inputs.md
 │   ├── training_protocol.md
 │   ├── configuration.md
-│   └── teammate_review.md
+│   ├── teammate_review.md
+│   ├── data_sources.md             # Source inventory and provenance limits
+│   ├── brca_source_preparation.md  # Acquisition, formulas and validation
+│   └── brca_driver_evidence.md     # Evidence rules, qualifications and replay
+├── notebooks/
+│   └── brca_driver_evidence_audit.ipynb # Source reconciliation and replay audit
 ├── data/
-│   └── README.md              # Required files and acquisition commands
+│   ├── README.md                  # Workflows, feature purpose and comparisons
+│   ├── brca/
+│   │   ├── BRCA_input_data.csv    # Canonical 13-feature gene dataset
+│   │   ├── manifest.json          # Sources, policies and artifact checksums
+│   │   └── summary.json           # Gene/sample coverage and exclusions
+│   └── brca_driver_evidence/
+│       ├── brca_driver_evidence.csv # Source assertions linked by evidence ID
+│       ├── brca_gene_status.csv     # Per-gene evidence status and benchmark labels
+│       ├── manifest.json           # Evidence-source provenance and checksums
+│       └── summary.json            # Evidence coverage and review counts
 └── results/
     └── README.md              # Output schema and interpretation
 ```
 
-Environments, downloaded data/source, results JSON, caches, and checkpoints are
-local artifacts excluded from Git. Share the Git repository, not a ZIP of the
-entire working directory containing ignored files.
+The canonical feature CSV, manifest and summary under `data/brca/`, plus the
+driver-evidence tables, manifest and summary under `data/brca_driver_evidence/`,
+are eligible for Git tracking.
 
 ## Environment setup
 
@@ -140,6 +178,15 @@ not validated here. `device: auto` uses CUDA when available, otherwise CPU;
 `--device cpu` forces the validated execution path. MPS is not selected.
 
 ## Data preparation
+
+Run `python3 scripts/preprocess_brca.py` to acquire pinned mutation/expression
+inputs, KEGG/HGNC memberships and the authors' mapped HumanNet v3 network.
+It writes one complete feature table, `data/brca/BRCA_input_data.csv`, plus
+compact audits and a checksum manifest, using only Python's standard library.
+All commands share `data/cache/`; replay tests use temporary directories.
+See [BRCA source preparation](docs/brca_source_preparation.md) for source limits,
+offline verification and optional modality diagnostics. Training still uses
+the baseline processed inputs below.
 
 From the project root, obtain the pinned upstream files directly from the authors:
 
@@ -306,8 +353,9 @@ python -m pytest -q tests
 ```
 
 Tests that require original source/data skip explicitly when those files are not
-provided. Standalone verification here: **55 passed, 24 skipped** (including the
-unavailable CUDA test). For the complete parity suite, supply the separately obtained checkout:
+provided. Raw preprocessing also has a standard-library test suite and an
+optional cached-source replay test; see [BRCA source preparation](docs/brca_source_preparation.md).
+For the complete parity suite, supply the separately obtained checkout:
 
 ```bash
 python -m pytest -q tests --brca-data-root data/upstream
@@ -318,7 +366,8 @@ module-level imports, CLI execution, and data-loading code are not run. Minimal
 CPU/DGL compatibility adapters are audited. No verbatim reference class files are
 shipped. A data-only directory cannot run original-source parity comparisons.
 
-Latest full verification: **78 passed, 1 skipped** (CUDA unavailable). Intermediate
+Latest full verification: **103 passed, 2 skipped** (CUDA unavailable; optional
+raw-source replay runs separately). Intermediate
 tensors/logits match exactly on controlled CPU fixtures with transferred active
 weights; gradients and one Adam update agree within numerical tolerance. Five
 real BRCA graphs match by gene identity, features, labels, and directed edge

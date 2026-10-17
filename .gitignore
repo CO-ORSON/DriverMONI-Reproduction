@@ -72,3 +72,18 @@ checkpoints/
 *.zip
 *.tar
 *.tar.gz
+
+# Canonical BRCA feature export and provenance; keep other data artifacts ignored.
+!data/brca/
+data/brca/*
+!data/brca/BRCA_input_data.csv
+!data/brca/manifest.json
+!data/brca/summary.json
+
+# BRCA driver-evidence tables and provenance; keep other artifacts ignored.
+!data/brca_driver_evidence/
+data/brca_driver_evidence/*
+!data/brca_driver_evidence/brca_driver_evidence.csv
+!data/brca_driver_evidence/brca_gene_status.csv
+!data/brca_driver_evidence/manifest.json
+!data/brca_driver_evidence/summary.json
