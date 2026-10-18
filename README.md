@@ -131,6 +131,7 @@ DriverMONI-Reproduction/
 │   ├── brca/
 │   │   ├── BRCA_input_data.csv    # Canonical 13-feature gene dataset
 │   │   ├── manifest.json          # Sources, policies and artifact checksums
+│   │   ├── manifest.original-2026-10-13.json # Original generation receipt
 │   │   └── summary.json           # Gene/sample coverage and exclusions
 │   └── brca_driver_evidence/
 │       ├── brca_driver_evidence.csv # Source assertions linked by evidence ID
@@ -141,7 +142,7 @@ DriverMONI-Reproduction/
     └── README.md              # Output schema and interpretation
 ```
 
-The canonical feature CSV, manifest and summary under `data/brca/`, plus the
+The canonical CSV, both manifests and summary under `data/brca/`, plus the
 driver-evidence tables, manifest and summary under `data/brca_driver_evidence/`,
 are eligible for Git tracking.
 
