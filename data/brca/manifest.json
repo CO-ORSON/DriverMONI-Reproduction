@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "created_at": "2026-10-12T17:39:52.971625+00:00",
+  "created_at": "2026-10-17T13:51:34.582396+00:00",
   "configuration": {
     "pipeline": {
       "omics_config": "configs/brca_omics_sources.json",
@@ -399,12 +399,12 @@
   "annotation_gene_records": 60675,
   "implementation": {
     "python": "3.13.5",
-    "feature_code_sha256": "96500272a61726585927cb504292537f0450915ea958a6344503214575cf5e78",
+    "feature_code_sha256": "5e530adfd7b5974a53b52aad6bd4e31863d34a6dd083f77ac5bb96c844cc993d",
     "acquisition_code_sha256": "0179bd9132a36af31a926cb2e85bb03c39416cf69efc2c2384d704c451c90c0d",
     "pathway_code_sha256": "f05652d320f389e8a3cb7d6dd5ce31c987481acdbb112944e215e58ee619fd57",
     "shared_schema_code_sha256": "b4df5e76f2fd55a1adf744d67553cb8a0e0abdf98744218676688fae8f544e47",
     "common_code_sha256": "9608f65b61a72124798f9afa2e44f660274bd77c4024d4bcc493c970d469d447",
-    "pipeline_code_sha256": "77f0546d6640c274fa0104302247e148db3f315750b7a5efab03713016a6f2d4"
+    "pipeline_code_sha256": "23560a3592c71b9677a0c6404882dcb6f3cc3fee7902f89b0253fcbbe7d28aec"
   },
   "formulas": {
     "mutation_proportions": "all_effects category annotation counts / all retained consequence annotations for that gene",
@@ -538,5 +538,28 @@
     "standardization": "ddof=1 over the final mutation-expression gene universe",
     "network": "LLS > 3.211; retain edge multiplicity; only feature-bearing neighbors contribute to PPI",
     "labels": "Supplied positives audited separately; remaining genes unlabelled"
+  },
+  "generation": {
+    "git_commit": "eea3323d95c8ece5914b15546434933a1114f4aa",
+    "working_tree_dirty_at_generation": false,
+    "entry_point": "scripts/preprocess_brca.py",
+    "entry_point_sha256": "bbe8b5fd64891b33c8b00afab0fb92bdb0a0ee129b5e6d2ec522944802234373",
+    "command": [
+      "/opt/anaconda3/bin/python3",
+      "scripts/preprocess_brca.py",
+      "--offline",
+      "--lock-manifest",
+      "/private/tmp/brca-provenance-refresh-5o7wwqe5/manifest.original-2026-10-13.json",
+      "--output-dir",
+      "/private/tmp/brca-provenance-refresh-5o7wwqe5/regenerated"
+    ],
+    "previous_manifest_file": "manifest.original-2026-10-13.json",
+    "previous_manifest_sha256": "39b933e99128eb4d904a3368202e1032b13556dda2b33faa4d9f625be8f5ea6b",
+    "verification": {
+      "source_snapshots_matched": 20,
+      "output_artifacts_matched": 11,
+      "all_recorded_code_hashes_match_committed_files": true
+    },
+    "metadata_note": "Git context was captured from the clean checkout before generation; this block was added after verifying source, code and output checksums."
   }
 }

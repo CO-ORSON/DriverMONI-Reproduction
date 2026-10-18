@@ -79,6 +79,7 @@ data/brca/*
 !data/brca/BRCA_input_data.csv
 !data/brca/manifest.json
 !data/brca/summary.json
+!data/brca/manifest.original-2026-10-13.json
 
 # BRCA driver-evidence tables and provenance; keep other artifacts ignored.
 !data/brca_driver_evidence/

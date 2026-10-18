@@ -25,6 +25,15 @@ separately. The manifest records consumed sources, checksums, settings, formulas
 Python/implementation versions and output hashes. A locked replay rejects changed
 source URLs or bytes.
 
+The 17 October 2026 rerun used a clean checkout of commit
+`eea3323d95c8ece5914b15546434933a1114f4aa` and the original locked sources.
+All 11 outputs, including `BRCA_input_data.csv` and `summary.json`, matched the
+original manifest's SHA-256 checksums, confirming byte-for-byte agreement.
+The refreshed manifest's `generation` block records the commit, working-tree
+status and entry-point checksum alongside the code-file hashes. The original
+manifest is preserved as `data/brca/manifest.original-2026-10-13.json`;
+both manifests are available for Git tracking.
+
 Use `--output-dir` for another dataset version, `--cache-dir` to relocate sources,
 and `--refresh` to fetch new bytes. CLI paths are relative to the shell directory;
 config paths are relative to the project. Custom configs support raw URLs and

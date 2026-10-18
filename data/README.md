@@ -41,6 +41,7 @@ remain undocumented.
 | `data/brca/BRCA_input_data.csv` | Combined mutation, expression, KEGG and PPI features in the existing schema. |
 | `data/brca/audit/`, `data/brca/references/` | Raw counts, group means, samples, mapping/exclusion audits, label coverage and pathway evidence. |
 | `data/brca/manifest.json`, `data/brca/summary.json` | Source URLs, checksums, configuration, formulas, mapping versions and coverage. |
+| `data/brca/manifest.original-2026-10-13.json` | Original generation receipt, preserved before refreshing code provenance. |
 | `data/cache/` | Shared download cache, including the mapped HumanNet ZIP. |
 
 Replay the recorded source snapshots without network access:
@@ -51,6 +52,8 @@ python3 scripts/preprocess_brca.py --offline --lock-manifest data/brca/manifest.
 
 The lock verifies source URLs and checksums. Optional modality diagnostics write
 under `data/diagnostics/`; historical datasets and receipts are in `data/history/`.
+The refreshed manifest's `generation` block identifies the committed code and
+verified source/output agreement with the original receipt; the CSV is unchanged.
 See [BRCA source preparation](../docs/brca_source_preparation.md) for source links,
 formula details, overrides and synthetic/real-source replay tests.
 
