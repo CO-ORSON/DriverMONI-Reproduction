@@ -26,7 +26,8 @@ Python/implementation versions and output hashes. A locked replay rejects change
 source URLs or bytes.
 
 The 17 October 2026 rerun used a clean checkout of commit
-`eea3323d95c8ece5914b15546434933a1114f4aa` and the original locked sources.
+`eea3323d95c8ece5914b15546434933a1114f4aa` and the same source snapshots,
+verified against the original manifest's checksums.
 All 11 outputs, including `BRCA_input_data.csv` and `summary.json`, matched the
 original manifest's SHA-256 checksums, confirming byte-for-byte agreement.
 The refreshed manifest's `generation` block records the commit, working-tree
