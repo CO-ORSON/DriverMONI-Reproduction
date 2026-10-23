@@ -1,6 +1,8 @@
 # Configuration and path reference
 
-`configs/brca.yaml` contains every supported setting. Unknown keys, missing keys,
+`configs/brca.yaml` contains the source-compatible settings.
+`configs/brca_validation.yaml` adds the optional validation-split setting for B.
+Unknown keys, missing required keys,
 unsupported model/graph settings, and invalid values fail before data loading.
 YAML numbers must be numbers, not quoted strings; booleans are `true`/`false`.
 
@@ -43,7 +45,7 @@ not promise identical results across CPU/GPU, package versions, or hardware.
 
 | Key below `data` | Meaning |
 | --- | --- |
-| `upstream_root` | Directory containing the original processed/reference file layout. |
+| `upstream_root` | Base directory for per-file data paths. The baseline uses `data/upstream`; the prepared-data and B configurations use `data`, containing both `brca/` and `upstream/`. |
 | `features` | BRCA feature CSV with gene identifiers and ordered model columns. |
 | `labels` | Driver Ensembl IDs in `gene_label`. |
 | `comparison_genes` | Original comparison list (`gene` column). |
@@ -83,15 +85,22 @@ against the following definitions, **not** used as an architecture search API.
 | `training.scheduler`, `early_stopping` | `null` only | Neither is implemented or used upstream. |
 | `training.epochs` | `10`; integer >=1 | All epochs execute. |
 | `training.batch_size` | `32`; integer >=2 | Reject folds with a final singleton train batch because of BatchNorm; do not silently drop it. |
-| `training.loss`, `class_weights` | `weighted_nll`, `inverse_training_fold_frequency` only | Float64 log-softmax, weighted mean NLL; `N_train/(2*n_class)`. |
-| `training.shuffle_train`, `shuffle_test` | `true`, `true` | Match upstream loader shuffle; configurable booleans. |
+| `training.loss`, `class_weights` | `weighted_nll`, `inverse_training_fold_frequency` only | Float64 log-softmax, weighted mean NLL; `N_train/(2*n_class)`. B computes both counts on the fitting subset, excluding validation and test targets. |
+| `training.shuffle_train`, `shuffle_test` | `true`, `true` | Match upstream loader shuffle; configurable booleans. B's validation loader is separately fixed to unshuffled order. |
 | `training.num_workers`, `drop_last` | `0`, `false` only | Preserve source batching and single-process loading. |
 | `training.preserve_eval_mode_after_first_evaluation` | `true` | Preserve source dropout/BN mode behavior; false explicitly changes the protocol. |
 | `cross_validation.n_splits`, `stratified`, `shuffle` | `3`, `true`, `true` only | Stratified shuffled target splits. Uses top-level seed as new explicit random_state. |
-| `cross_validation.epoch_selection` | `best_test_roc_auc` only | Maximum test AUC, earliest epoch wins ties; not untouched-test evaluation. |
+| `cross_validation.epoch_selection` | `best_test_roc_auc` or `best_validation_roc_auc` | Baseline: select by maximum test-fold AUC. B: select by maximum inner validation AUC, restore the selected model, then evaluate the outer test fold once. Earliest epoch wins ties in either mode. |
+| `cross_validation.validation_fraction` | Required for `best_validation_roc_auc`; B sets `0.25` | Fraction of each outer training fold reserved for validation, strictly between 0 and 1. Uses stratified `train_test_split` with `random_state=seed`. A new project choice, not an author hyperparameter. Omit for `best_test_roc_auc`. |
 
 Changing optimizer values, epochs, batch size or shuffle is permitted for explicit
 experiments but departs from the documented baseline. Effective settings are saved.
+
+B uses all ten epochs with no early stopping and no refit on the full outer
+training fold. Its `preserve_eval_mode_after_first_evaluation` remains `true`.
+It writes `results/brca_validation_metrics.json`, preserving both existing
+experiment filenames. See [the B guide](brca_validation_experiment.md) for the
+small validation-positive counts and the limits of comparison with the baseline.
 
 ## Evaluation
 

@@ -47,7 +47,10 @@ the latter as paper-specified methodology.
   Upstream saves individual fold values without computing mean/std. This is not
   a confidence interval; set 1 explicitly for sample standard deviation.
 
-## Per-fold execution
+## Source-compatible per-fold execution
+
+This section applies to `best_test_roc_auc`, used by the original-data and
+prepared-data reproduction configurations. B is specified separately below.
 
 1. Split target genes with stratification. Neighborhood features retain the full
    filtered context table; labels are not node features.
@@ -70,6 +73,50 @@ uninitialized-result edge case if all AUC values are exactly zero. For positive
 AUC, selection matches the original. Singleton training batches are rejected
 rather than silently dropped, because source BatchNorm cannot train on them.
 The default BRCA folds do not produce singleton training batches.
+
+## B: validation-based epoch selection
+
+`configs/brca_validation.yaml` implements suggestion 2 only. It uses the same
+prepared data and outer folds as `brca_updated_data.yaml`; it does not change
+the DNN/GAT architecture, features, labels or graph construction.
+
+1. Create the same three shuffled stratified outer folds with `random_state=seed`.
+2. Split each outer training fold with stratified
+   `train_test_split(test_size=0.25, random_state=seed)`. These inner fitting and
+   validation subsets are disjoint from each other and the outer test targets.
+   The fraction is a new project choice, not a setting supplied by the authors.
+3. Derive class weights **only from the fitting subset**, using
+   `N_fit / (2 * n_fit_class)`, and initialize a fresh model and Adam optimizer.
+4. Run all ten epochs with the existing batch size, optimizer, loss and learning
+   rate. Evaluate the validation subset after each epoch. Preserve the source
+   behavior: epoch one optimizes in training mode; subsequent epochs optimize in
+   evaluation mode with dropout disabled and BatchNorm statistics frozen.
+   Validation loading is unshuffled; train/test loader settings remain unchanged.
+5. Keep a copy of the complete model state at each strict improvement in
+   validation AUC, including BatchNorm buffers. Select the earliest maximum.
+   Test predictions and test metrics are not calculated during epoch selection.
+6. After all ten epochs, restore the selected state and evaluate the outer test
+   fold once. There is no early stopping and no refit on the full outer training
+   fold. Final fold metrics and their aggregate describe these test predictions.
+7. Record the outer training, fitting, validation and test assignments; class
+   counts and fitting-only weights; validation history; selected validation
+   predictions; and final test metrics/predictions separately.
+
+For the current prepared dataset and seed 42, each fitting subset has 21 drivers,
+each validation subset has 7, and each test fold has 14. Validation selection can
+therefore be unstable; the fold standard deviation is not a confidence interval.
+The reduction in fitting samples is part of this protocol change.
+
+This removes use of the outer test labels for epoch selection. It does not
+rebuild preprocessing within each fold, remove shared graph-feature context, or
+establish a fully inductive setting. Original normalized features remain supplied
+as input. Keep these limits when interpreting the resulting scores.
+
+Use B as the evaluation reference for a future C experiment that restores
+training mode each epoch. B and C should share the exact inputs, outer/inner
+splits, seeds and other settings. The existing test-selected A score is not an
+unbiased comparator for claiming performance gains. See the
+[B execution guide](brca_validation_experiment.md).
 
 ## Verification and limits
 

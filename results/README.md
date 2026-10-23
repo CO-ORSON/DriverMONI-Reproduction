@@ -11,6 +11,12 @@ rebuilt neighborhoods with the same model/training settings. Its population and
 graph context differ from the baseline; interpret it as a distinct experiment.
 See [its guide and provenance limits](../docs/brca_updated_data_experiment.md).
 
+The **B experiment**, `configs/brca_validation.yaml`, writes
+`brca_validation_metrics.json`. It uses the same prepared dataset, but selects
+epochs on an inner validation subset and evaluates each outer test fold once
+after restoring the selected model. The original training-mode behavior remains
+enabled. See [the B guide](../docs/brca_validation_experiment.md).
+
 `scripts/smoke_test.py` writes `brca_smoke_metrics.json` separately. It runs only
 12 real targets, two epochs per fold, batch size 4, and three folds on CPU; the
 `smoke_test` field identifies its limited scope. Do not use its scores as a full
@@ -37,3 +43,20 @@ reports every metric at that same epoch. It also preserves evaluation-mode
 parameter updates after epoch one. The held-out folds therefore participate in
 epoch selection; these scores are not an untouched-test-set estimate. Neither a
 separate validation split nor early stopping is silently introduced.
+
+## B output interpretation
+
+With `best_validation_roc_auc`, the report additionally distinguishes the outer
+training fold from its fitting and validation subsets. Class weights come from
+the fitting subset only. The epoch history contains validation metrics; selected
+validation metrics/predictions are recorded separately from the final test
+metrics/predictions. Each test target occurs in exactly one outer test fold.
+
+The summary aggregates the three final **test** results, not validation results.
+All ten epochs execute; the restored model includes the selected epoch's
+BatchNorm state. No checkpoint file or full-outer-training refit is produced.
+
+Compare a future training-mode variant C against B using the same inner and
+outer splits. A difference between A's test-selected result and B's result cannot
+establish a model improvement: epoch selection and fitting sample counts differ.
+The current graph context and preprocessing remain shared across target splits.
