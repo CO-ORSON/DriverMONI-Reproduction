@@ -1,0 +1,92 @@
+# Version C: validation-based selection plus training mode restored every epoch.
+# Comparison B: configs/brca_validation.yaml (unchanged). Same data and splits.
+# See docs/brca_training_mode_experiment.md; model architecture stays unchanged.
+cancer: BRCA
+upstream:
+  repository: https://github.com/BML-cbnu/DriverMONI
+  commit: ddb0a830158ba41c90019bd5ca92054c2ba0869b
+
+seed: 42  # New default, not an upstream seed; integer 0 <= seed < 2**31 (DGL).
+device: auto  # auto, cpu, cuda, cuda:0; upstream hard-codes CUDA.
+reproducibility:
+  deterministic_algorithms: true  # New; upstream does not configure determinism.
+  cpu_threads: 1  # New execution setting; upstream leaves thread count unspecified.
+
+data:
+  # The existing runner resolves every input below from this project-relative base.
+  upstream_root: data
+  features: brca/BRCA_input_data.csv
+  labels: upstream/using_Data/BRCA_label.csv  # Original 42 positives; other genes class 0.
+  # Required configuration keys, unused because the two switches below are false.
+  comparison_genes: upstream/for_concat_data/after_concat_BRCA_genes2.csv
+  gene_annotations: upstream/gene_info_for_GOSemSim.csv
+  ppi_edges: upstream/for_ref/humannetv3_ens_ppi.csv  # ZIP fallback supported.
+  neighbors: upstream/PPI_graph/gene_n_humannet_BRCA.pickle
+  # Use all genes in this CSV; do not apply the old benchmark population filter.
+  use_comparison_filter: false
+  # Rebuild one-hop neighborhoods, including the three newly present genes.
+  use_supplied_neighbors: false
+
+model:
+  dnn:
+    input_dim: 12
+    hidden_dims: [256, 128]
+    output_dim: 64
+    dropout: [0.7, 0.6]
+  gat:
+    input_dim: 13
+    attention_dim: 64
+    output_dim: 32
+    attention_activation: sigmoid
+  fusion:
+    extra_gat_projection_dim: 32
+    concatenated_dim: 96
+    num_classes: 2
+
+graph:
+  hops: 1
+  neighbor_discovery: undirected
+  message_edges: csv_direction
+  self_loops: true
+  edge_threshold: null
+
+training:
+  optimizer: adam
+  learning_rate: 0.001
+  weight_decay: 0.0  # Upstream does not pass this argument: Adam's default is zero.
+  betas: [0.9, 0.999]  # Upstream Adam defaults, made explicit.
+  eps: 1.0e-8  # Upstream Adam default.
+  amsgrad: false  # Upstream Adam default.
+  scheduler: null  # No learning-rate scheduler in the active source.
+  early_stopping: null  # No early stopping; all ten epochs run.
+  epochs: 10
+  batch_size: 32
+  loss: weighted_nll
+  class_weights: inverse_training_fold_frequency
+  shuffle_train: true
+  shuffle_test: true
+  num_workers: 0
+  drop_last: false
+  # C's sole training change: call model.train() before EVERY epoch's updates.
+  # Dropout and BatchNorm train throughout; validation/test still use eval().
+  preserve_eval_mode_after_first_evaluation: false
+
+cross_validation:
+  n_splits: 3
+  stratified: true
+  shuffle: true
+  # Identical outer and inner splitter seeds to B; no per-fold reseeding.
+  epoch_selection: best_validation_roc_auc
+  # Same project choice as B, not an authors' setting: 25% of each outer
+  # training fold is reserved for stratified validation with random_state=seed.
+  validation_fraction: 0.25
+
+evaluation:
+  # Only AUC and balanced accuracy are calculated upstream; the others are added.
+  metrics: [auc, accuracy, precision, recall, f1, balanced_accuracy]
+  positive_class: 1
+  probability_threshold: 0.5
+  zero_division: 0  # New precision/recall/F1 convention; not specified upstream.
+  std_ddof: 0  # New population std across folds; upstream does not aggregate std.
+
+output_path: results/brca_validation_train_mode_metrics.json

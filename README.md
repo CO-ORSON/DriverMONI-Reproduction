@@ -7,8 +7,10 @@ training, three-fold cross-validation, and evaluation in a readable Python proje
 This is a group-project reimplementation, not an official release. The baseline
 uses supplied processed inputs; separate raw-input source preparation is
 documented below. A separate **B experiment** selects epochs using validation
-data while retaining the original model and training-mode behavior. Other cancers
-are outside this stage.
+data while retaining the original model and training-mode behavior. **C** keeps
+B's validation procedure and restores training mode before every epoch. These
+experiments test changes to the training/evaluation protocol; the architecture
+is unchanged. Other cancers are outside this stage.
 
 ## Original paper and repository
 
@@ -68,6 +70,7 @@ DriverMONI-Reproduction/
 │   ├── brca.yaml                      # Baseline training settings
 │   ├── brca_updated_data.yaml         # Separate experiment using data/brca CSV
 │   ├── brca_validation.yaml           # B: validation-based epoch selection
+│   ├── brca_validation_train_mode.yaml # C: B plus training mode each epoch
 │   ├── brca_preprocessing.json        # Combined canonical dataset workflow
 │   ├── brca_omics_sources.json        # Mutation/expression sources and policies
 │   ├── brca_sources.json              # KEGG retrieval and HGNC snapshot
@@ -112,6 +115,7 @@ DriverMONI-Reproduction/
 │   ├── test_dataset.py
 │   ├── test_training.py
 │   ├── test_validation_training.py # B: validation selection and restored-state testing
+│   ├── test_training_mode_experiment.py # B/C modes, BatchNorm, dropout and replay
 │   ├── test_portability.py
 │   ├── test_intermediate_parity.py
 │   ├── test_source_audit.py
@@ -127,6 +131,7 @@ DriverMONI-Reproduction/
 │   ├── teammate_review.md
 │   ├── brca_updated_data_experiment.md # Prepared-data reproduction experiment
 │   ├── brca_validation_experiment.md   # B protocol, execution and interpretation
+│   ├── brca_training_mode_experiment.md # C protocol and B-versus-C comparison
 │   ├── data_sources.md             # Source inventory and provenance limits
 │   ├── brca_source_preparation.md  # Acquisition, formulas and validation
 │   └── brca_driver_evidence.md     # Evidence rules, qualifications and replay
@@ -295,10 +300,30 @@ This writes `results/brca_validation_metrics.json`. Within each outer training
 fold, B reserves 25% for stratified validation, selects the earliest epoch with
 maximum validation AUC, restores that epoch's model state, and evaluates the
 outer test fold once. It retains the authors' evaluation-mode updates after
-epoch one; restoring training mode each epoch is a separate proposed experiment.
+epoch one; C below separately restores training mode each epoch.
 The model architecture, inputs and original configurations remain unchanged.
 See the [B experiment guide](docs/brca_validation_experiment.md) for the split
 counts, PyCharm setup, configuration choices and limitations.
+
+### C: validation selection with training mode restored every epoch
+
+With the same inputs as B, run:
+
+```bash
+python scripts/run_brca.py --config configs/brca_validation_train_mode.yaml --device cpu
+```
+
+C uses `preserve_eval_mode_after_first_evaluation: false` so the existing trainer
+calls `model.train()` before every epoch. Dropout and BatchNorm operate in training
+mode for all training epochs; validation and final testing still use `eval()`.
+The selected state includes BatchNorm buffers. The only effective configuration
+changes from B are this flag and the separate output path,
+`results/brca_validation_train_mode_metrics.json`.
+
+The [C experiment guide](docs/brca_training_mode_experiment.md) explains the
+comparison, PyCharm setup and limitations. C is an experimental protocol change,
+not a claim of improved predictive performance. The original reproduction and
+B configurations remain available.
 
 ## Training procedure
 
@@ -389,6 +414,28 @@ fewer fitting targets and a different selection protocol from A; they are not
 evidence of a performance improvement. See the [B results and verification
 record](docs/brca_validation_experiment.md#completed-local-experiment).
 
+The **C combined experiment** completed all three folds and 30 epochs on
+23 October 2026 in 15.2 minutes on CPU, selecting epochs 5, 2 and 2. Its input
+hashes, runtime environment and all fitting/validation/test target assignments
+match B. Both runs use seed 42 and threshold 0.5. Test results below are mean ±
+population standard deviation across the three folds:
+
+| Metric | B: validation selection | C: validation selection + training mode each epoch |
+| --- | --- | --- |
+| ROC-AUC | 0.918824 ± 0.016343 | 0.905708 ± 0.034354 |
+| Precision | 0.095931 ± 0.028804 | 0.066514 ± 0.031041 |
+| Recall | 0.333333 ± 0.134687 | 0.357143 ± 0.303046 |
+| F1 | 0.145655 ± 0.046222 | 0.103845 ± 0.051883 |
+
+C did **not** improve mean AUC, precision or F1 in this experiment. Mean recall
+increased slightly, with substantially greater variation between folds. This is
+a single-seed comparison, not evidence that either protocol is generally better.
+Dropout and BatchNorm change together, and continued dropout can change later
+batch orders and initial weights under the shared RNG. See the [C guide and
+verified comparison](docs/brca_training_mode_experiment.md) for all six metrics,
+per-fold results and the interpretation limits. The original reproduction and B
+results remain unchanged.
+
 ## Differences from original implementation
 
 - Clean modules and names replace the monolithic script. Target masks use
@@ -409,6 +456,9 @@ record](docs/brca_validation_experiment.md#completed-local-experiment).
 - The optional B configuration changes epoch selection to a separate validation
   subset. Its 25% validation fraction is a project choice, not an author setting;
   the source-compatible configurations retain their original behavior.
+- C uses B's validation procedure and restores training mode every epoch. It
+  retains the original architecture, inputs, splits and optimizer settings; it
+  does not reproduce the original evaluation-mode updates after epoch one.
 
 See [REPRODUCTION_NOTES.md](REPRODUCTION_NOTES.md) for exact evidence and unresolved
 points. There is no claim of an identical original full training trajectory.
@@ -440,11 +490,15 @@ module-level imports, CLI execution, and data-loading code are not run. Minimal
 CPU/DGL compatibility adapters are audited. No verbatim reference class files are
 shipped. A data-only directory cannot run original-source parity comparisons.
 
-Latest full verification for the B extension: **133 passed, 2 skipped** (CUDA
-unavailable; cached raw-source replay not supplied). Tests cover disjoint inner
+Latest full verification including C: **137 passed, 2 skipped** (CUDA
+unavailable; cached raw-source replay not supplied). C tests exercise actual
+Dropout and BatchNorm behavior across epochs, unchanged evaluation state,
+complete selected-state restoration, seeded replay and matching B/C partitions.
+Tests also cover disjoint inner
 splits, fitting-only weights, validation-only selection, complete selected-state
-restoration, and one final test evaluation per fold. A controlled before/after
-baseline run matched exactly in all non-timing report fields. Intermediate
+restoration, and one final test evaluation per fold. The earlier controlled
+before/after B baseline run matched exactly in all non-timing report fields;
+C adds no production-code changes. Intermediate
 tensors/logits match exactly on controlled CPU fixtures with transferred active
 weights; gradients and one Adam update agree within numerical tolerance. Five
 real BRCA graphs match by gene identity, features, labels, and directed edge

@@ -112,11 +112,45 @@ rebuild preprocessing within each fold, remove shared graph-feature context, or
 establish a fully inductive setting. Original normalized features remain supplied
 as input. Keep these limits when interpreting the resulting scores.
 
-Use B as the evaluation reference for a future C experiment that restores
-training mode each epoch. B and C should share the exact inputs, outer/inner
-splits, seeds and other settings. The existing test-selected A score is not an
-unbiased comparator for claiming performance gains. See the
-[B execution guide](brca_validation_experiment.md).
+Use B as the evaluation reference for C, specified below. The existing
+test-selected A score is not an unbiased comparator for claiming performance
+gains. See the [B execution guide](brca_validation_experiment.md).
+
+## C: validation selection and training mode every epoch
+
+`configs/brca_validation_train_mode.yaml` combines B's validation-based epoch
+selection with `preserve_eval_mode_after_first_evaluation: false`. Only this flag
+and the output filename differ from B's configuration. This is an explicit
+departure from the source-compatible reproduction; the scientific architecture,
+features, labels and graph algorithm are unchanged.
+
+The same runner calls `model.train()` before **every** C training epoch. Dropout
+is active and BatchNorm running statistics update during all ten epochs. Each
+validation pass and the final test pass call `model.eval()` and do not update
+parameters or BatchNorm statistics. B instead keeps evaluation mode for parameter
+updates after its first validation pass.
+
+All other B steps apply: the same stratified outer/inner target splits,
+fitting-only class weights, constant Adam learning rate, batch size, validation
+AUC selection, earliest tie handling, complete selected-state restoration and
+one final outer-test evaluation. All ten epochs run, with no early stopping,
+outer-training refit or saved checkpoint file. The selected state includes
+BatchNorm's statistics and counters, not just learned parameters.
+
+B and C share the same top-level seed, data and target assignments. The runner
+seeds once before CV; additional dropout in C consumes random numbers and can
+change subsequent shuffled batch orders and later-fold initial weights. Equal
+seeds therefore do not imply an identical stochastic trajectory between the
+protocols. BatchNorm statistics differ as a direct consequence of the mode
+change. Keep the existing random-number handling for both experiments and report
+this limitation; repeated paired seeds would strengthen a later comparison.
+
+Compare C's final outer-test AUC, precision, recall and F1 with B's, retaining
+per-fold results and population standard deviation. Do not promise better scores
+or choose a new setting based on these test outcomes while still treating them
+as untouched evaluation. The small validation-positive counts, shared precomputed
+features and graph context described for B also apply to C. See the
+[C execution guide](brca_training_mode_experiment.md).
 
 ## Verification and limits
 
