@@ -12,10 +12,11 @@ protocol, not a claim of higher predictive performance or exact source parity.
 | `configs/brca.yaml` | Original processed data and filtered targets | Test-fold AUC | Source behavior |
 | `configs/brca_updated_data.yaml` (A) | Prepared CSV, all 16,786 targets | Test-fold AUC | Source behavior |
 | `configs/brca_validation.yaml` (B) | Same prepared CSV as A | Inner validation AUC | Source behavior |
+| `configs/brca_validation_train_mode.yaml` (C) | Same prepared CSV as B | Same inner validation as B | Training mode restored each epoch |
 
-The original configurations and output filenames remain unchanged. A future C
-would use B's validation protocol and restore training mode each epoch. C is not
-part of this experiment.
+The original configurations and output filenames remain unchanged. The separate
+[C experiment](brca_training_mode_experiment.md) uses B's validation protocol and
+restores training mode each epoch. This document and its results describe B.
 
 ## Inputs and environment
 
@@ -125,8 +126,11 @@ every possible information-sharing issue: precomputed normalized features and
 the full graph-feature context are still shared across target splits. It is not
 a fully inductive experiment and does not establish raw preprocessing parity.
 
-For a future B-versus-C comparison, hold data, all inner/outer splits, seeds and
-other settings fixed. Comparing A's test-selected AUC against B is not a fair
+For the [B-versus-C comparison](brca_training_mode_experiment.md), hold data,
+all inner/outer splits, the configured seed and other settings fixed. The seed
+is set once before CV; active dropout consumes additional random numbers, so
+identical per-fold initial weights and minibatch orders are not guaranteed across
+B and C. Comparing A's test-selected AUC against B is not a fair
 test of model improvement; B also uses fewer fitting targets. Retain A as the
 source-compatible reproduction record.
 

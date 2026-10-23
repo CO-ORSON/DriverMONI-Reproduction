@@ -17,6 +17,12 @@ epochs on an inner validation subset and evaluates each outer test fold once
 after restoring the selected model. The original training-mode behavior remains
 enabled. See [the B guide](../docs/brca_validation_experiment.md).
 
+The **C experiment**, `configs/brca_validation_train_mode.yaml`, writes
+`brca_validation_train_mode_metrics.json`. It keeps B's validation protocol and
+calls `model.train()` before every training epoch, restoring training-mode
+dropout and BatchNorm throughout optimization. Validation and test inference
+remain in evaluation mode. See [the C guide](../docs/brca_training_mode_experiment.md).
+
 `scripts/smoke_test.py` writes `brca_smoke_metrics.json` separately. It runs only
 12 real targets, two epochs per fold, batch size 4, and three folds on CPU; the
 `smoke_test` field identifies its limited scope. Do not use its scores as a full
@@ -44,7 +50,7 @@ parameter updates after epoch one. The held-out folds therefore participate in
 epoch selection; these scores are not an untouched-test-set estimate. Neither a
 separate validation split nor early stopping is silently introduced.
 
-## B output interpretation
+## B and C output interpretation
 
 With `best_validation_roc_auc`, the report additionally distinguishes the outer
 training fold from its fitting and validation subsets. Class weights come from
@@ -56,7 +62,15 @@ The summary aggregates the three final **test** results, not validation results.
 All ten epochs execute; the restored model includes the selected epoch's
 BatchNorm state. No checkpoint file or full-outer-training refit is produced.
 
-Compare a future training-mode variant C against B using the same inner and
-outer splits. A difference between A's test-selected result and B's result cannot
-establish a model improvement: epoch selection and fitting sample counts differ.
-The current graph context and preprocessing remain shared across target splits.
+Compare C against B using the same data, inner/outer target splits, seed and
+other settings. Verify that each C epoch records training mode, while B records
+training mode only in epoch one. The shared top-level seed does not promise
+identical batch orders or later-fold initial weights: C's additional dropout
+consumes random numbers, and the runner seeds once before CV. Report any changes
+across AUC, precision, recall and F1 without assuming they all improve.
+
+A difference between A's test-selected result and B's result cannot establish a
+model improvement: epoch selection and fitting sample counts differ. The current
+graph context and preprocessing remain shared across target splits in B and C.
+Each validation subset has only seven drivers; treat one three-fold experiment
+as limited evidence rather than a guaranteed general performance gain.
