@@ -34,7 +34,7 @@ def load_config(path: str | Path) -> dict[str, Any]:
 
 
 def validate_config(config: dict[str, Any]) -> None:
-    """Validate the BRCA-only source-compatible pipeline's supported configuration."""
+    """Validate BRCA reproduction and explicit validation-selection settings."""
     if not isinstance(config, dict):
         raise ValueError("Configuration must be a YAML mapping")
     required = {"cancer", "seed", "device", "reproducibility", "data", "model", "graph",
@@ -61,6 +61,8 @@ def validate_config(config: dict[str, Any]) -> None:
         values = config[section]
         if not isinstance(values, dict):
             raise ValueError(f"{section} must be a YAML mapping")
+        if section == "cross_validation" and values.get("epoch_selection") == "best_validation_roc_auc":
+            keys = keys | {"validation_fraction"}
         if set(values) != keys:
             raise ValueError(f"Invalid {section} keys: missing={sorted(keys - set(values))}, "
                              f"unknown={sorted(set(values) - keys)}")
@@ -116,8 +118,12 @@ def validate_config(config: dict[str, Any]) -> None:
     cv = config["cross_validation"]
     if cv.get("n_splits") != 3 or cv.get("stratified") is not True or cv.get("shuffle") is not True:
         raise ValueError("Use three-fold shuffled stratified CV")
-    if cv.get("epoch_selection") != "best_test_roc_auc":
-        raise ValueError("Only the documented upstream best_test_roc_auc selection is implemented")
+    if cv.get("epoch_selection") not in {"best_test_roc_auc", "best_validation_roc_auc"}:
+        raise ValueError("epoch_selection must be best_test_roc_auc or best_validation_roc_auc")
+    if cv["epoch_selection"] == "best_validation_roc_auc":
+        fraction = cv["validation_fraction"]
+        if not _finite_number(fraction) or not 0 < fraction < 1:
+            raise ValueError("cross_validation.validation_fraction must be a finite number in (0, 1)")
     evaluation = config["evaluation"]
     if (type(evaluation["positive_class"]) is not int or evaluation["positive_class"] != 1
             or not _finite_number(evaluation["probability_threshold"])

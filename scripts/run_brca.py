@@ -41,7 +41,10 @@ def main() -> None:
         use_supplied_neighbors=data["use_supplied_neighbors"],
         paths={key: data[key] for key in ["features", "labels", "comparison_genes", "gene_annotations", "ppi_edges", "neighbors"]},
     )
-    print(f"Loaded {len(dataset)} targets. Epochs are selected by held-out fold AUC (upstream behavior).", flush=True)
+    selection = ("inner-validation AUC; each outer test fold is evaluated once after epoch selection"
+                 if config["cross_validation"]["epoch_selection"] == "best_validation_roc_auc"
+                 else "test-fold AUC (upstream behavior)")
+    print(f"Loaded {len(dataset)} targets. Epoch selection: {selection}.", flush=True)
     run_cross_validation(
         dataset, config, project_path(config["output_path"]), input_files=input_manifest(data),
         log=lambda message: print(message, flush=True),

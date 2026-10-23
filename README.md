@@ -6,7 +6,9 @@ Reproduce the authors’ **BRCA** model architecture, processed-data graph input
 training, three-fold cross-validation, and evaluation in a readable Python project.
 This is a group-project reimplementation, not an official release. The baseline
 uses supplied processed inputs; separate raw-input source preparation is
-documented below. Other cancers and algorithm improvements are outside this stage.
+documented below. A separate **B experiment** selects epochs using validation
+data while retaining the original model and training-mode behavior. Other cancers
+are outside this stage.
 
 ## Original paper and repository
 
@@ -65,6 +67,7 @@ DriverMONI-Reproduction/
 ├── configs/
 │   ├── brca.yaml                      # Baseline training settings
 │   ├── brca_updated_data.yaml         # Separate experiment using data/brca CSV
+│   ├── brca_validation.yaml           # B: validation-based epoch selection
 │   ├── brca_preprocessing.json        # Combined canonical dataset workflow
 │   ├── brca_omics_sources.json        # Mutation/expression sources and policies
 │   ├── brca_sources.json              # KEGG retrieval and HGNC snapshot
@@ -108,6 +111,7 @@ DriverMONI-Reproduction/
 │   ├── test_model.py
 │   ├── test_dataset.py
 │   ├── test_training.py
+│   ├── test_validation_training.py # B: validation selection and restored-state testing
 │   ├── test_portability.py
 │   ├── test_intermediate_parity.py
 │   ├── test_source_audit.py
@@ -121,6 +125,8 @@ DriverMONI-Reproduction/
 │   ├── training_protocol.md
 │   ├── configuration.md
 │   ├── teammate_review.md
+│   ├── brca_updated_data_experiment.md # Prepared-data reproduction experiment
+│   ├── brca_validation_experiment.md   # B protocol, execution and interpretation
 │   ├── data_sources.md             # Source inventory and provenance limits
 │   ├── brca_source_preparation.md  # Acquisition, formulas and validation
 │   └── brca_driver_evidence.md     # Evidence rules, qualifications and replay
@@ -181,7 +187,10 @@ not validated here. `device: auto` uses CUDA when available, otherwise CPU;
 
 ## Data preparation
 
-Run `python3 scripts/preprocess_brca.py` to acquire pinned mutation/expression
+Raw preprocessing is **optional** when running the supplied processed datasets.
+The prepared-data and B configurations use the uploaded CSV directly; follow
+their input instructions without regenerating it. To recreate the CSV separately,
+run `python3 scripts/preprocess_brca.py` to acquire pinned mutation/expression
 inputs, KEGG/HGNC memberships and the authors' mapped HumanNet v3 network.
 It writes one complete feature table, `data/brca/BRCA_input_data.csv`, plus
 compact audits and a checksum manifest, using only Python's standard library.
@@ -273,7 +282,29 @@ settings below, but disables the original comparison-gene filter. See the
 [input layout, PyCharm instructions and provenance limits](docs/brca_updated_data_experiment.md).
 The original configuration and its results remain available.
 
+### B: select epochs using a separate validation set
+
+Use the same prepared CSV and two original auxiliary files as the new-data
+experiment above:
+
+```bash
+python scripts/run_brca.py --config configs/brca_validation.yaml --device cpu
+```
+
+This writes `results/brca_validation_metrics.json`. Within each outer training
+fold, B reserves 25% for stratified validation, selects the earliest epoch with
+maximum validation AUC, restores that epoch's model state, and evaluates the
+outer test fold once. It retains the authors' evaluation-mode updates after
+epoch one; restoring training mode each epoch is a separate proposed experiment.
+The model architecture, inputs and original configurations remain unchanged.
+See the [B experiment guide](docs/brca_validation_experiment.md) for the split
+counts, PyCharm setup, configuration choices and limitations.
+
 ## Training procedure
+
+The following source-compatible procedure applies to `brca.yaml` and
+`brca_updated_data.yaml`. B's separate validation procedure is described above
+and in [the protocol reference](docs/training_protocol.md#b-validation-based-epoch-selection).
 
 1. Read processed features and apply symbol deduplication. The baseline also
    applies the original comparison-gene/annotation filters; the new-data
@@ -345,8 +376,18 @@ neighborhoods, its mean ROC-AUC was **0.932188 ± 0.020985**; precision was
 0.060602 ± 0.020310 and recall 0.523810 ± 0.089087 at threshold 0.5. These results
 use a different population and graph context from the baseline, and preserve
 test-fold epoch selection; they do not establish an improvement over the baseline.
-All metrics, fold details, PyCharm instructions and unresolved preprocessing
-provenance are documented in the [new-data experiment guide](docs/brca_updated_data_experiment.md).
+All metrics, fold details, PyCharm instructions and the original provenance
+review are documented in the [new-data experiment guide](docs/brca_updated_data_experiment.md).
+The subsequent manifest refresh and byte-identical CSV replay are recorded in
+[BRCA source preparation](docs/brca_source_preparation.md).
+
+The **B validation-selection experiment** completed all three folds on
+23 October 2026 in 15.3 minutes on CPU. Mean test ROC-AUC was
+**0.918824 ± 0.016343**, precision 0.095931 ± 0.028804, and recall
+0.333333 ± 0.134687. Validation selected epochs 5, 1 and 2. These scores use
+fewer fitting targets and a different selection protocol from A; they are not
+evidence of a performance improvement. See the [B results and verification
+record](docs/brca_validation_experiment.md#completed-local-experiment).
 
 ## Differences from original implementation
 
@@ -365,6 +406,9 @@ provenance are documented in the [new-data experiment guide](docs/brca_updated_d
   and unfiltered directed graph differ from aspects of the paper’s description.
   Source behavior is retained. Raw feature-formula differences are documented,
   not silently corrected or regenerated.
+- The optional B configuration changes epoch selection to a separate validation
+  subset. Its 25% validation fraction is a project choice, not an author setting;
+  the source-compatible configurations retain their original behavior.
 
 See [REPRODUCTION_NOTES.md](REPRODUCTION_NOTES.md) for exact evidence and unresolved
 points. There is no claim of an identical original full training trajectory.
@@ -396,8 +440,11 @@ module-level imports, CLI execution, and data-loading code are not run. Minimal
 CPU/DGL compatibility adapters are audited. No verbatim reference class files are
 shipped. A data-only directory cannot run original-source parity comparisons.
 
-Latest full verification: **103 passed, 2 skipped** (CUDA unavailable; optional
-raw-source replay runs separately). Intermediate
+Latest full verification for the B extension: **133 passed, 2 skipped** (CUDA
+unavailable; cached raw-source replay not supplied). Tests cover disjoint inner
+splits, fitting-only weights, validation-only selection, complete selected-state
+restoration, and one final test evaluation per fold. A controlled before/after
+baseline run matched exactly in all non-timing report fields. Intermediate
 tensors/logits match exactly on controlled CPU fixtures with transferred active
 weights; gradients and one Adam update agree within numerical tolerance. Five
 real BRCA graphs match by gene identity, features, labels, and directed edge
