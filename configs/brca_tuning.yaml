@@ -1,0 +1,20 @@
+# Experiment D: an initial one-seed learning-rate/dropout search.
+# Separate from the reproduction, A/B/C, and the Streamlit demo.
+base_config: configs/brca_validation_train_mode.yaml
+seed: 42
+device: cpu
+
+# Evaluate all six candidates inside each outer training fold. Candidate order
+# is learning-rate major, dropout-pair minor. Highest best validation AUC wins;
+# ties prefer the earlier candidate; earliest maximum epoch wins within a trial.
+search:
+  learning_rates: [0.001, 0.0003, 0.0001]
+  dropout_pairs:
+    - [0.7, 0.6]
+    - [0.5, 0.3]
+  selection_metric: auc
+
+# Each independent process runs one outer fold with one CPU compute thread.
+# This controls runtime, not the candidate selection or scientific settings.
+parallel_folds: 3
+output_dir: results/brca_tuning
