@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "artifact_type": "compact_experiment_result",
+  "status": "complete",
+  "experiment": "A",
+  "description": "A: authors' training behavior on updated BRCA data",
+  "cancer": "BRCA",
+  "dataset_counts": {
+    "driver": 42,
+    "non_driver": 16744
+  },
+  "num_targets": 16786,
+  "std_ddof": 0,
+  "export": {
+    "raw_report": "results/brca_updated_data_metrics.json",
+    "raw_report_sha256": "17fa3245cfefa3ea1509f8d0188d1596f0d1f7d0c671ea153af82af653605065",
+    "omitted": [
+      "per-gene predictions",
+      "gene split membership",
+      "epoch histories",
+      "checkpoints",
+      "source input files",
+      "logs",
+      "machine-specific absolute paths"
+    ],
+    "validation_scope": "Report structure, full-run coverage, selection consistency and aggregate arithmetic checked; no independent training replay or prediction-metric recomputation by this exporter.",
+    "path_normalization": "Configured paths are project-relative where possible, otherwise input/output role labels; input checksums retain file identity.",
+    "replay_limit": "A compact summary is not a complete replay artifact; obtain the documented inputs and rerun the experiment to produce detailed reports."
+  },
+  "provenance": {
+    "effective_config": {
+      "cancer": "BRCA",
+      "upstream": {
+        "repository": "https://github.com/BML-cbnu/DriverMONI",
+        "commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b"
+      },
+      "seed": 42,
+      "device": "cpu",
+      "reproducibility": {
+        "deterministic_algorithms": true,
+        "cpu_threads": 1
+      },
+      "data": {
+        "upstream_root": "data",
+        "features": "brca/BRCA_input_data.csv",
+        "labels": "upstream/using_Data/BRCA_label.csv",
+        "comparison_genes": "upstream/for_concat_data/after_concat_BRCA_genes2.csv",
+        "gene_annotations": "upstream/gene_info_for_GOSemSim.csv",
+        "ppi_edges": "upstream/for_ref/humannetv3_ens_ppi.csv",
+        "neighbors": "upstream/PPI_graph/gene_n_humannet_BRCA.pickle",
+        "use_comparison_filter": false,
+        "use_supplied_neighbors": false
+      },
+      "model": {
+        "dnn": {
+          "input_dim": 12,
+          "hidden_dims": [
+            256,
+            128
+          ],
+          "output_dim": 64,
+          "dropout": [
+            0.7,
+            0.6
+          ]
+        },
+        "gat": {
+          "input_dim": 13,
+          "attention_dim": 64,
+          "output_dim": 32,
+          "attention_activation": "sigmoid"
+        },
+        "fusion": {
+          "extra_gat_projection_dim": 32,
+          "concatenated_dim": 96,
+          "num_classes": 2
+        }
+      },
+      "graph": {
+        "hops": 1,
+        "neighbor_discovery": "undirected",
+        "message_edges": "csv_direction",
+        "self_loops": true,
+        "edge_threshold": null
+      },
+      "training": {
+        "optimizer": "adam",
+        "learning_rate": 0.001,
+        "weight_decay": 0.0,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "scheduler": null,
+        "early_stopping": null,
+        "epochs": 10,
+        "batch_size": 32,
+        "loss": "weighted_nll",
+        "class_weights": "inverse_training_fold_frequency",
+        "shuffle_train": true,
+        "shuffle_test": true,
+        "num_workers": 0,
+        "drop_last": false,
+        "preserve_eval_mode_after_first_evaluation": true
+      },
+      "cross_validation": {
+        "n_splits": 3,
+        "stratified": true,
+        "shuffle": true,
+        "epoch_selection": "best_test_roc_auc"
+      },
+      "evaluation": {
+        "metrics": [
+          "auc",
+          "accuracy",
+          "precision",
+          "recall",
+          "f1",
+          "balanced_accuracy"
+        ],
+        "positive_class": 1,
+        "probability_threshold": 0.5,
+        "zero_division": 0,
+        "std_ddof": 0
+      },
+      "output_path": "results/brca_updated_data_metrics.json"
+    },
+    "seed": 42,
+    "runtime": {
+      "python": "3.12.14",
+      "platform": "macOS-15.7.9-arm64-arm-64bit",
+      "packages": {
+        "torch": "2.2.2",
+        "dgl": "2.2.0",
+        "numpy": "1.26.4",
+        "pandas": "3.0.6",
+        "scikit-learn": "1.9.1"
+      },
+      "cpu_threads": 1,
+      "cuda_version": null
+    },
+    "device": "cpu",
+    "input_files": [
+      {
+        "role": "features",
+        "bytes": 2782345,
+        "sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c"
+      },
+      {
+        "role": "labels",
+        "bytes": 843,
+        "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9"
+      },
+      {
+        "role": "ppi_edges",
+        "bytes": 9768702,
+        "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51"
+      }
+    ]
+  },
+  "protocol": {
+    "selection": "maximum test-fold AUC across epochs; earliest epoch wins ties",
+    "test_fold_used_for_epoch_selection": true,
+    "seed_strategy": "seed Python/NumPy/PyTorch/CUDA/DGL once before CV; explicit splitter random_state",
+    "shared_graph_feature_context": true,
+    "std_ddof": 0,
+    "source_preserve_eval_mode": true
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "class_weights": {
+        "non_driver": 0.5012542555097653,
+        "driver": 199.82142857142856
+      },
+      "train_counts": {
+        "driver": 28,
+        "non_driver": 11162
+      },
+      "test_counts": {
+        "driver": 14,
+        "non_driver": 5582
+      },
+      "selected_epoch": 4,
+      "test_metrics": {
+        "auc": 0.9092875057583047,
+        "accuracy": 0.9874910650464618,
+        "precision": 0.08823529411764706,
+        "recall": 0.42857142857142855,
+        "f1": 0.14634146341463414,
+        "balanced_accuracy": 0.7087321492552593
+      }
+    },
+    {
+      "fold": 2,
+      "class_weights": {
+        "non_driver": 0.5012541431514826,
+        "driver": 199.8392857142857
+      },
+      "train_counts": {
+        "driver": 28,
+        "non_driver": 11163
+      },
+      "test_counts": {
+        "driver": 14,
+        "non_driver": 5581
+      },
+      "selected_epoch": 2,
+      "test_metrics": {
+        "auc": 0.9599854096808048,
+        "accuracy": 0.9706881143878463,
+        "precision": 0.05357142857142857,
+        "recall": 0.6428571428571429,
+        "f1": 0.0989010989010989,
+        "balanced_accuracy": 0.8071838124248087
+      }
+    },
+    {
+      "fold": 3,
+      "class_weights": {
+        "non_driver": 0.5012541431514826,
+        "driver": 199.8392857142857
+      },
+      "train_counts": {
+        "driver": 28,
+        "non_driver": 11163
+      },
+      "test_counts": {
+        "driver": 14,
+        "non_driver": 5581
+      },
+      "selected_epoch": 9,
+      "test_metrics": {
+        "auc": 0.9272915760104437,
+        "accuracy": 0.968722073279714,
+        "precision": 0.04,
+        "recall": 0.5,
+        "f1": 0.07407407407407407,
+        "balanced_accuracy": 0.7349489338828167
+      }
+    }
+  ],
+  "summary": {
+    "auc": {
+      "mean": 0.9321881638165177,
+      "std": 0.02098494372386556
+    },
+    "accuracy": {
+      "mean": 0.9756337509046741,
+      "std": 0.008422717431743592
+    },
+    "precision": {
+      "mean": 0.060602240896358545,
+      "std": 0.02030985214315571
+    },
+    "recall": {
+      "mean": 0.5238095238095238,
+      "std": 0.08908708063747482
+    },
+    "f1": {
+      "mean": 0.10643887879660237,
+      "std": 0.029980632468754622
+    },
+    "balanced_accuracy": {
+      "mean": 0.7502882985209616,
+      "std": 0.04163055429080171
+    }
+  },
+  "run_times": {
+    "started_at_utc": "2026-10-17T03:15:10.921229+00:00",
+    "finished_at_utc": "2026-10-17T03:34:51.394253+00:00",
+    "elapsed_seconds": 1180.4640143750003
+  }
+}

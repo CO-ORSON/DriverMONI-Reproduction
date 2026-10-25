@@ -17,6 +17,14 @@ data/*
 !data/README.md
 results/*
 !results/README.md
+# Reviewed, compact experiment snapshots; raw predictions/checkpoints stay local.
+!results/published/
+results/published/*
+!results/published/original.json
+!results/published/a.json
+!results/published/b.json
+!results/published/c.json
+!results/published/d.json
 *.pt
 *.pth
 *.ckpt
