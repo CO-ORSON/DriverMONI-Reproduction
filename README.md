@@ -8,9 +8,13 @@ This is a group-project reimplementation, not an official release. The baseline
 uses supplied processed inputs; separate raw-input source preparation is
 documented below. A separate **B experiment** selects epochs using validation
 data while retaining the original model and training-mode behavior. **C** keeps
-B's validation procedure and restores training mode before every epoch. These
-experiments test changes to the training/evaluation protocol; the architecture
-is unchanged. Other cancers are outside this stage.
+B's validation procedure and restores training mode before every epoch. **D**
+adds a validation-only learning-rate/dropout search with a matched fixed-C
+control. These experiments test changes to the training/evaluation protocol;
+the layer structure is unchanged. A local Streamlit app provides feature exploration, saved-score
+inspection, an experiment comparison, and optional live model inference. Other
+cancers are outside this stage. A separate hosted viewer lets teammates browse
+results, gene measurements and the architecture without the model environment.
 
 ## Original paper and repository
 
@@ -63,7 +67,15 @@ DriverMONI-Reproduction/
 ├── REPRODUCTION_NOTES.md       # Evidence and limits of source parity
 ├── THIRD_PARTY_NOTICES.md      # Upstream attribution and license findings
 ├── requirements.txt
+├── requirements-app.txt       # Model requirements plus optional Streamlit UI
 ├── requirements-lock-macos-arm64.txt
+├── streamlit_app.py           # Local BRCA explorer and model demonstration
+├── cloud/
+│   ├── app.py                 # Hosted results viewer; no live inference
+│   ├── requirements.txt       # Lightweight deployment dependencies
+│   └── tests/                # Tests runnable without PyTorch/DGL
+├── app_assets/
+│   └── experiment_summary.json # Legacy optional A/B/C export; app uses results/published
 ├── .gitignore
 ├── pytest.ini
 ├── configs/
@@ -85,6 +97,9 @@ DriverMONI-Reproduction/
 │   │   └── drivermoni.py
 │   ├── dataset.py             # Features, labels, samples, batching
 │   ├── feature_schema.py      # Shared feature order for preprocessing and loading
+│   ├── app_data.py            # Feature inspection without loading model dependencies
+│   ├── app_results.py         # Validated saved-score and aggregate-result loading
+│   ├── inference.py           # Demo checkpoint export, provenance and live prediction
 │   ├── preprocessing/
 │   │   ├── __init__.py
 │   │   ├── acquisition.py          # Download cache and source locks
@@ -99,6 +114,8 @@ DriverMONI-Reproduction/
 │   └── utils.py               # Seeds, config, devices, provenance
 ├── scripts/
 │   ├── run_brca.py                    # Full benchmark experiment
+│   ├── prepare_demo_model.py          # Export a separate validation-selected fold-1 model
+│   ├── export_app_results.py          # Verify full reports and refresh the app summary
 │   ├── debug_brca.py                  # Inspect graph inputs
 │   ├── smoke_test.py                  # Small real-data pipeline check
 │   ├── preprocess_brca.py             # Combined canonical BRCA export
@@ -116,6 +133,8 @@ DriverMONI-Reproduction/
 │   ├── test_training.py
 │   ├── test_validation_training.py # B: validation selection and restored-state testing
 │   ├── test_training_mode_experiment.py # B/C modes, BatchNorm, dropout and replay
+│   ├── test_app_results.py     # Saved-result validation and compact summary checks
+│   ├── test_inference.py       # Checkpoint, inference and provenance checks
 │   ├── test_portability.py
 │   ├── test_intermediate_parity.py
 │   ├── test_source_audit.py
@@ -132,6 +151,8 @@ DriverMONI-Reproduction/
 │   ├── brca_updated_data_experiment.md # Prepared-data reproduction experiment
 │   ├── brca_validation_experiment.md   # B protocol, execution and interpretation
 │   ├── brca_training_mode_experiment.md # C protocol and B-versus-C comparison
+│   ├── streamlit_app.md            # Local app, PyCharm setup and model export
+│   ├── deploy_streamlit.md         # Online deployment and sharing steps
 │   ├── data_sources.md             # Source inventory and provenance limits
 │   ├── brca_source_preparation.md  # Acquisition, formulas and validation
 │   └── brca_driver_evidence.md     # Evidence rules, qualifications and replay
@@ -324,6 +345,88 @@ The [C experiment guide](docs/brca_training_mode_experiment.md) explains the
 comparison, PyCharm setup and limitations. C is an experimental protocol change,
 not a claim of improved predictive performance. The original reproduction and
 B configurations remain available.
+
+## Local Streamlit app
+
+Use the existing Python 3.12 environment. From the project root:
+
+```bash
+python -m pip install -r requirements-app.txt
+python -m streamlit run streamlit_app.py --server.address 127.0.0.1
+```
+
+Open the local address printed by Streamlit. The sidebar starts with
+**Experiments**, followed by **Gene explorer**, **Live prediction**,
+**Model architecture**, and **Setup**. Experiment selectors follow
+**Original → A → B → C → D**. Published summaries in `results/published/`
+provide all five recorded results without training or downloading the original
+data. The app explains the metrics and compares D with its matched C control.
+Gene exploration uses the authors' CSV for Original and the team's CSV for A–D.
+Individual saved scores require a completed local CV report.
+
+For live inference, first place the original labels and HumanNet files as
+described in the [B input guide](docs/brca_validation_experiment.md#inputs-and-environment).
+Then prepare a separate demo checkpoint:
+
+```bash
+python scripts/prepare_demo_model.py --config configs/brca_validation.yaml --output checkpoints/brca_demo.pt --device cpu
+```
+
+This replays B's first outer fold and exports the complete validation-selected
+model state. It leaves the official full CV results unchanged. The app shows
+whether each live gene was in that model's fitting, validation, or test subset.
+Its score is a positive-class model score, not a calibrated biological
+probability; class 0 means absent from the benchmark driver list. A full-CV saved
+score may come from a different fold's model.
+
+If D's tuning run is already complete locally, import its saved fold-one winner
+without retraining:
+
+```bash
+python scripts/prepare_tuned_demo.py --report results/brca_tuning/fold_1/report.json --output checkpoints/brca_demo_d.pt --device cpu
+```
+
+The live-model selector offers B and D in that order, defaulting to D when its
+checkpoint is available. Both checkpoints stay local. The importer checks D's
+selected settings, source/input identity and saved predictions before exporting.
+See the [app guide](docs/streamlit_app.md) for PyCharm setup and artifact details.
+
+Checkpoints and full per-gene reports remain local and Git-ignored. See the
+[app guide](docs/streamlit_app.md) for **PyCharm click-by-click setup**, input
+placement, score interpretation and troubleshooting. The full live-prediction
+app is validated locally; the separate hosted viewer below uses fewer dependencies.
+
+### Share the results viewer online
+
+The hosted viewer includes **Experiments**, **Gene explorer** (the team's updated
+measurements), **Model architecture**, and **About this app**. It uses the same
+blue-grey theme and ordered Original/A/B/C/D result selector. It does not run live
+predictions, train models, or include the authors' original input files, model
+checkpoints or detailed per-gene reports.
+
+Deploy on [Streamlit Community Cloud](https://share.streamlit.io) with:
+
+| Field | Value |
+| --- | --- |
+| Repository | `CO-ORSON/DriverMONI-Reproduction` |
+| Branch | `main`, after merging the Streamlit pull request |
+| Main file path | `cloud/app.py` |
+| Advanced settings → Python version | `3.12` |
+| Secrets | Leave empty; this viewer needs no credentials |
+
+Use `cloud/app.py` so Community Cloud installs the adjacent
+`cloud/requirements.txt`, rather than the scientific training dependencies.
+Follow [the step-by-step deployment guide](docs/deploy_streamlit.md) for deploying,
+checking the pages, sharing the URL, and stopping the hosted app. Deployment is
+performed in your own Streamlit account; a successful local test is not proof
+that a hosted deployment has completed.
+
+To preview the same viewer locally in a separate Python 3.12 environment:
+
+```bash
+python -m pip install -r cloud/requirements.txt
+python -m streamlit run cloud/app.py --server.address 127.0.0.1
+```
 
 ## Training procedure
 

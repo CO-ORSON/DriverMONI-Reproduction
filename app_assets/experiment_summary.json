@@ -1,0 +1,842 @@
+{
+  "schema_version": 1,
+  "scope": "recorded_cross_validation_results",
+  "experiments": [
+    {
+      "status": "complete",
+      "cancer": "BRCA",
+      "device": "cpu",
+      "runtime": {
+        "python": "3.12.14",
+        "platform": "macOS-15.7.9-arm64-arm-64bit",
+        "packages": {
+          "torch": "2.2.2",
+          "dgl": "2.2.0",
+          "numpy": "1.26.4",
+          "pandas": "3.0.6",
+          "scikit-learn": "1.9.1"
+        },
+        "cpu_threads": 1,
+        "cuda_version": null
+      },
+      "dataset_counts": {
+        "driver": 42,
+        "non_driver": 16744
+      },
+      "num_targets": 16786,
+      "protocol": {
+        "selection": "maximum test-fold AUC across epochs; earliest epoch wins ties",
+        "test_fold_used_for_epoch_selection": true,
+        "seed_strategy": "seed Python/NumPy/PyTorch/CUDA/DGL once before CV; explicit splitter random_state",
+        "shared_graph_feature_context": true,
+        "std_ddof": 0,
+        "source_preserve_eval_mode": true
+      },
+      "summary": {
+        "auc": {
+          "mean": 0.9321881638165177,
+          "std": 0.02098494372386556
+        },
+        "accuracy": {
+          "mean": 0.9756337509046741,
+          "std": 0.008422717431743592
+        },
+        "precision": {
+          "mean": 0.060602240896358545,
+          "std": 0.02030985214315571
+        },
+        "recall": {
+          "mean": 0.5238095238095238,
+          "std": 0.08908708063747482
+        },
+        "f1": {
+          "mean": 0.10643887879660237,
+          "std": 0.029980632468754622
+        },
+        "balanced_accuracy": {
+          "mean": 0.7502882985209616,
+          "std": 0.04163055429080171
+        }
+      },
+      "started_at_utc": "2026-10-17T03:15:10.921229+00:00",
+      "finished_at_utc": "2026-10-17T03:34:51.394253+00:00",
+      "elapsed_seconds": 1180.4640143750003,
+      "experiment": "A",
+      "source_filename": "brca_updated_data_metrics.json",
+      "report_sha256": "17fa3245cfefa3ea1509f8d0188d1596f0d1f7d0c671ea153af82af653605065",
+      "seed": 42,
+      "config": {
+        "cancer": "BRCA",
+        "upstream": {
+          "repository": "https://github.com/BML-cbnu/DriverMONI",
+          "commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b"
+        },
+        "seed": 42,
+        "device": "cpu",
+        "reproducibility": {
+          "deterministic_algorithms": true,
+          "cpu_threads": 1
+        },
+        "model": {
+          "dnn": {
+            "input_dim": 12,
+            "hidden_dims": [
+              256,
+              128
+            ],
+            "output_dim": 64,
+            "dropout": [
+              0.7,
+              0.6
+            ]
+          },
+          "gat": {
+            "input_dim": 13,
+            "attention_dim": 64,
+            "output_dim": 32,
+            "attention_activation": "sigmoid"
+          },
+          "fusion": {
+            "extra_gat_projection_dim": 32,
+            "concatenated_dim": 96,
+            "num_classes": 2
+          }
+        },
+        "graph": {
+          "hops": 1,
+          "neighbor_discovery": "undirected",
+          "message_edges": "csv_direction",
+          "self_loops": true,
+          "edge_threshold": null
+        },
+        "training": {
+          "optimizer": "adam",
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "amsgrad": false,
+          "scheduler": null,
+          "early_stopping": null,
+          "epochs": 10,
+          "batch_size": 32,
+          "loss": "weighted_nll",
+          "class_weights": "inverse_training_fold_frequency",
+          "shuffle_train": true,
+          "shuffle_test": true,
+          "num_workers": 0,
+          "drop_last": false,
+          "preserve_eval_mode_after_first_evaluation": true
+        },
+        "cross_validation": {
+          "n_splits": 3,
+          "stratified": true,
+          "shuffle": true,
+          "epoch_selection": "best_test_roc_auc"
+        },
+        "evaluation": {
+          "metrics": [
+            "auc",
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "balanced_accuracy"
+          ],
+          "positive_class": 1,
+          "probability_threshold": 0.5,
+          "zero_division": 0,
+          "std_ddof": 0
+        },
+        "data": {
+          "use_comparison_filter": false,
+          "use_supplied_neighbors": false
+        }
+      },
+      "input_files": [
+        {
+          "role": "features",
+          "sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+          "bytes": 2782345
+        },
+        {
+          "role": "labels",
+          "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9",
+          "bytes": 843
+        },
+        {
+          "role": "ppi_edges",
+          "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51",
+          "bytes": 9768702
+        }
+      ],
+      "feature_sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+      "folds": [
+        {
+          "fold": 1,
+          "selected_epoch": 4,
+          "metrics": {
+            "auc": 0.9092875057583047,
+            "accuracy": 0.9874910650464618,
+            "precision": 0.08823529411764706,
+            "recall": 0.42857142857142855,
+            "f1": 0.14634146341463414,
+            "balanced_accuracy": 0.7087321492552593
+          },
+          "train_counts": {
+            "driver": 28,
+            "non_driver": 11162
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5582
+          },
+          "class_weights": {
+            "non_driver": 0.5012542555097653,
+            "driver": 199.82142857142856
+          }
+        },
+        {
+          "fold": 2,
+          "selected_epoch": 2,
+          "metrics": {
+            "auc": 0.9599854096808048,
+            "accuracy": 0.9706881143878463,
+            "precision": 0.05357142857142857,
+            "recall": 0.6428571428571429,
+            "f1": 0.0989010989010989,
+            "balanced_accuracy": 0.8071838124248087
+          },
+          "train_counts": {
+            "driver": 28,
+            "non_driver": 11163
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541431514826,
+            "driver": 199.8392857142857
+          }
+        },
+        {
+          "fold": 3,
+          "selected_epoch": 9,
+          "metrics": {
+            "auc": 0.9272915760104437,
+            "accuracy": 0.968722073279714,
+            "precision": 0.04,
+            "recall": 0.5,
+            "f1": 0.07407407407407407,
+            "balanced_accuracy": 0.7349489338828167
+          },
+          "train_counts": {
+            "driver": 28,
+            "non_driver": 11163
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541431514826,
+            "driver": 199.8392857142857
+          }
+        }
+      ]
+    },
+    {
+      "status": "complete",
+      "cancer": "BRCA",
+      "device": "cpu",
+      "runtime": {
+        "python": "3.12.14",
+        "platform": "macOS-15.7.9-arm64-arm-64bit",
+        "packages": {
+          "torch": "2.2.2",
+          "dgl": "2.2.0",
+          "numpy": "1.26.4",
+          "pandas": "3.0.6",
+          "scikit-learn": "1.9.1"
+        },
+        "cpu_threads": 1,
+        "cuda_version": null
+      },
+      "dataset_counts": {
+        "driver": 42,
+        "non_driver": 16744
+      },
+      "num_targets": 16786,
+      "protocol": {
+        "selection": "maximum inner-validation AUC across epochs; earliest epoch wins ties; restore selected model state, then evaluate outer test once",
+        "test_fold_used_for_epoch_selection": false,
+        "seed_strategy": "seed Python/NumPy/PyTorch/CUDA/DGL once before CV; explicit splitter random_state",
+        "shared_graph_feature_context": true,
+        "std_ddof": 0,
+        "source_preserve_eval_mode": true,
+        "validation_fraction": 0.25,
+        "validation_split_seed": 42,
+        "validation_split": "stratified holdout within each outer training fold",
+        "validation_loader_shuffle": false,
+        "class_weight_population": "inner training targets only",
+        "test_evaluations_per_fold": 1,
+        "refit_on_outer_training": false
+      },
+      "summary": {
+        "auc": {
+          "mean": 0.9188239519345768,
+          "std": 0.016343198484614643
+        },
+        "accuracy": {
+          "mean": 0.9904089222417903,
+          "std": 0.0030049934135032604
+        },
+        "precision": {
+          "mean": 0.09593073593073594,
+          "std": 0.028803725742820207
+        },
+        "recall": {
+          "mean": 0.3333333333333333,
+          "std": 0.13468700594029476
+        },
+        "f1": {
+          "mean": 0.14565536921213015,
+          "std": 0.04622243663878812
+        },
+        "balanced_accuracy": {
+          "mean": 0.662695226696556,
+          "std": 0.06619206075513771
+        }
+      },
+      "started_at_utc": "2026-10-22T18:18:16.426166+00:00",
+      "finished_at_utc": "2026-10-22T18:33:35.510841+00:00",
+      "elapsed_seconds": 919.1251749161165,
+      "experiment": "B",
+      "source_filename": "brca_validation_metrics.json",
+      "report_sha256": "768f94681927bbcc4388ba89e15a21fab8a70d6d361c628e0171564962a00fac",
+      "seed": 42,
+      "config": {
+        "cancer": "BRCA",
+        "upstream": {
+          "repository": "https://github.com/BML-cbnu/DriverMONI",
+          "commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b"
+        },
+        "seed": 42,
+        "device": "cpu",
+        "reproducibility": {
+          "deterministic_algorithms": true,
+          "cpu_threads": 1
+        },
+        "model": {
+          "dnn": {
+            "input_dim": 12,
+            "hidden_dims": [
+              256,
+              128
+            ],
+            "output_dim": 64,
+            "dropout": [
+              0.7,
+              0.6
+            ]
+          },
+          "gat": {
+            "input_dim": 13,
+            "attention_dim": 64,
+            "output_dim": 32,
+            "attention_activation": "sigmoid"
+          },
+          "fusion": {
+            "extra_gat_projection_dim": 32,
+            "concatenated_dim": 96,
+            "num_classes": 2
+          }
+        },
+        "graph": {
+          "hops": 1,
+          "neighbor_discovery": "undirected",
+          "message_edges": "csv_direction",
+          "self_loops": true,
+          "edge_threshold": null
+        },
+        "training": {
+          "optimizer": "adam",
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "amsgrad": false,
+          "scheduler": null,
+          "early_stopping": null,
+          "epochs": 10,
+          "batch_size": 32,
+          "loss": "weighted_nll",
+          "class_weights": "inverse_training_fold_frequency",
+          "shuffle_train": true,
+          "shuffle_test": true,
+          "num_workers": 0,
+          "drop_last": false,
+          "preserve_eval_mode_after_first_evaluation": true
+        },
+        "cross_validation": {
+          "n_splits": 3,
+          "stratified": true,
+          "shuffle": true,
+          "epoch_selection": "best_validation_roc_auc",
+          "validation_fraction": 0.25
+        },
+        "evaluation": {
+          "metrics": [
+            "auc",
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "balanced_accuracy"
+          ],
+          "positive_class": 1,
+          "probability_threshold": 0.5,
+          "zero_division": 0,
+          "std_ddof": 0
+        },
+        "data": {
+          "use_comparison_filter": false,
+          "use_supplied_neighbors": false
+        }
+      },
+      "input_files": [
+        {
+          "role": "features",
+          "sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+          "bytes": 2782345
+        },
+        {
+          "role": "labels",
+          "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9",
+          "bytes": 843
+        },
+        {
+          "role": "ppi_edges",
+          "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51",
+          "bytes": 9768702
+        }
+      ],
+      "feature_sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+      "folds": [
+        {
+          "fold": 1,
+          "selected_epoch": 5,
+          "metrics": {
+            "auc": 0.9162870450939243,
+            "accuracy": 0.9862401715511079,
+            "precision": 0.08,
+            "recall": 0.42857142857142855,
+            "f1": 0.1348314606741573,
+            "balanced_accuracy": 0.708105133848595
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8371
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5582
+          },
+          "class_weights": {
+            "non_driver": 0.5012543304264724,
+            "driver": 199.8095238095238
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.848902083226698,
+            "accuracy": 0.9853466761972838,
+            "precision": 0.05263157894736842,
+            "recall": 0.2857142857142857,
+            "f1": 0.08888888888888889,
+            "balanced_accuracy": 0.6364078415314531
+          }
+        },
+        {
+          "fold": 2,
+          "selected_epoch": 1,
+          "metrics": {
+            "auc": 0.9399877134154146,
+            "accuracy": 0.9917783735478105,
+            "precision": 0.13636363636363635,
+            "recall": 0.42857142857142855,
+            "f1": 0.20689655172413793,
+            "balanced_accuracy": 0.7108813064734942
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8372
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541806020067,
+            "driver": 199.83333333333331
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.9059732814659365,
+            "accuracy": 0.9899928520371694,
+            "precision": 0.043478260869565216,
+            "recall": 0.14285714285714285,
+            "f1": 0.06666666666666667,
+            "balanced_accuracy": 0.5674873317295388
+          }
+        },
+        {
+          "fold": 3,
+          "selected_epoch": 2,
+          "metrics": {
+            "auc": 0.9001970972943917,
+            "accuracy": 0.9932082216264522,
+            "precision": 0.07142857142857142,
+            "recall": 0.14285714285714285,
+            "f1": 0.09523809523809523,
+            "balanced_accuracy": 0.5690992397675788
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8372
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541806020067,
+            "driver": 199.83333333333331
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.8759277268772072,
+            "accuracy": 0.9939242315939957,
+            "precision": 0.1875,
+            "recall": 0.42857142857142855,
+            "f1": 0.2608695652173913,
+            "balanced_accuracy": 0.7119567999181041
+          }
+        }
+      ]
+    },
+    {
+      "status": "complete",
+      "cancer": "BRCA",
+      "device": "cpu",
+      "runtime": {
+        "python": "3.12.14",
+        "platform": "macOS-15.7.9-arm64-arm-64bit",
+        "packages": {
+          "torch": "2.2.2",
+          "dgl": "2.2.0",
+          "numpy": "1.26.4",
+          "pandas": "3.0.6",
+          "scikit-learn": "1.9.1"
+        },
+        "cpu_threads": 1,
+        "cuda_version": null
+      },
+      "dataset_counts": {
+        "driver": 42,
+        "non_driver": 16744
+      },
+      "num_targets": 16786,
+      "protocol": {
+        "selection": "maximum inner-validation AUC across epochs; earliest epoch wins ties; restore selected model state, then evaluate outer test once",
+        "test_fold_used_for_epoch_selection": false,
+        "seed_strategy": "seed Python/NumPy/PyTorch/CUDA/DGL once before CV; explicit splitter random_state",
+        "shared_graph_feature_context": true,
+        "std_ddof": 0,
+        "source_preserve_eval_mode": false,
+        "validation_fraction": 0.25,
+        "validation_split_seed": 42,
+        "validation_split": "stratified holdout within each outer training fold",
+        "validation_loader_shuffle": false,
+        "class_weight_population": "inner training targets only",
+        "test_evaluations_per_fold": 1,
+        "refit_on_outer_training": false
+      },
+      "summary": {
+        "auc": {
+          "mean": 0.905708450729961,
+          "std": 0.03435377304854447
+        },
+        "accuracy": {
+          "mean": 0.985642304186381,
+          "std": 0.0059325322240992885
+        },
+        "precision": {
+          "mean": 0.06651405935450354,
+          "std": 0.03104076441070011
+        },
+        "recall": {
+          "mean": 0.35714285714285715,
+          "std": 0.3030457633656632
+        },
+        "f1": {
+          "mean": 0.10384459498581435,
+          "std": 0.05188282999059091
+        },
+        "balanced_accuracy": {
+          "mean": 0.6721808158150439,
+          "std": 0.149281120563474
+        }
+      },
+      "started_at_utc": "2026-10-23T03:21:38.895956+00:00",
+      "finished_at_utc": "2026-10-23T03:36:50.501644+00:00",
+      "elapsed_seconds": 911.6516880001873,
+      "experiment": "C",
+      "source_filename": "brca_validation_train_mode_metrics.json",
+      "report_sha256": "250fa0d3c1816c0fe92b76169ae60cb7f8c8be89257af0f493369e2883c40172",
+      "seed": 42,
+      "config": {
+        "cancer": "BRCA",
+        "upstream": {
+          "repository": "https://github.com/BML-cbnu/DriverMONI",
+          "commit": "ddb0a830158ba41c90019bd5ca92054c2ba0869b"
+        },
+        "seed": 42,
+        "device": "cpu",
+        "reproducibility": {
+          "deterministic_algorithms": true,
+          "cpu_threads": 1
+        },
+        "model": {
+          "dnn": {
+            "input_dim": 12,
+            "hidden_dims": [
+              256,
+              128
+            ],
+            "output_dim": 64,
+            "dropout": [
+              0.7,
+              0.6
+            ]
+          },
+          "gat": {
+            "input_dim": 13,
+            "attention_dim": 64,
+            "output_dim": 32,
+            "attention_activation": "sigmoid"
+          },
+          "fusion": {
+            "extra_gat_projection_dim": 32,
+            "concatenated_dim": 96,
+            "num_classes": 2
+          }
+        },
+        "graph": {
+          "hops": 1,
+          "neighbor_discovery": "undirected",
+          "message_edges": "csv_direction",
+          "self_loops": true,
+          "edge_threshold": null
+        },
+        "training": {
+          "optimizer": "adam",
+          "learning_rate": 0.001,
+          "weight_decay": 0.0,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-08,
+          "amsgrad": false,
+          "scheduler": null,
+          "early_stopping": null,
+          "epochs": 10,
+          "batch_size": 32,
+          "loss": "weighted_nll",
+          "class_weights": "inverse_training_fold_frequency",
+          "shuffle_train": true,
+          "shuffle_test": true,
+          "num_workers": 0,
+          "drop_last": false,
+          "preserve_eval_mode_after_first_evaluation": false
+        },
+        "cross_validation": {
+          "n_splits": 3,
+          "stratified": true,
+          "shuffle": true,
+          "epoch_selection": "best_validation_roc_auc",
+          "validation_fraction": 0.25
+        },
+        "evaluation": {
+          "metrics": [
+            "auc",
+            "accuracy",
+            "precision",
+            "recall",
+            "f1",
+            "balanced_accuracy"
+          ],
+          "positive_class": 1,
+          "probability_threshold": 0.5,
+          "zero_division": 0,
+          "std_ddof": 0
+        },
+        "data": {
+          "use_comparison_filter": false,
+          "use_supplied_neighbors": false
+        }
+      },
+      "input_files": [
+        {
+          "role": "features",
+          "sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+          "bytes": 2782345
+        },
+        {
+          "role": "labels",
+          "sha256": "da6235d0433cfeca6f62ee15df4ca59a4fb358643af5a26e7bc974dbdfb6bff9",
+          "bytes": 843
+        },
+        {
+          "role": "ppi_edges",
+          "sha256": "a4f2def6d7b5665f5ea177928e6f129bb4585f2a8073474586cbdffe25c69c51",
+          "bytes": 9768702
+        }
+      ],
+      "feature_sha256": "f5b6d89aa4f08af738185a025bf1fe78deed8a57b60f183066024c6777552f4c",
+      "folds": [
+        {
+          "fold": 1,
+          "selected_epoch": 5,
+          "metrics": {
+            "auc": 0.8662665711214618,
+            "accuracy": 0.9939242315939957,
+            "precision": 0.08333333333333333,
+            "recall": 0.14285714285714285,
+            "f1": 0.10526315789473684,
+            "balanced_accuracy": 0.5694579515790551
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8371
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5582
+          },
+          "class_weights": {
+            "non_driver": 0.5012543304264724,
+            "driver": 199.8095238095238
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.8007882479398065,
+            "accuracy": 0.9953538241601144,
+            "precision": 0.2,
+            "recall": 0.2857142857142857,
+            "f1": 0.23529411764705882,
+            "balanced_accuracy": 0.6414239647847674
+          }
+        },
+        {
+          "fold": 2,
+          "selected_epoch": 2,
+          "metrics": {
+            "auc": 0.9499961604423169,
+            "accuracy": 0.9803395889186773,
+            "precision": 0.09322033898305085,
+            "recall": 0.7857142857142857,
+            "f1": 0.16666666666666666,
+            "balanced_accuracy": 0.8832710471753653
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8372
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541806020067,
+            "driver": 199.83333333333331
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.9141628704509392,
+            "accuracy": 0.9799857040743388,
+            "precision": 0.0196078431372549,
+            "recall": 0.14285714285714285,
+            "f1": 0.034482758620689655,
+            "balanced_accuracy": 0.5624712084762246
+          }
+        },
+        {
+          "fold": 3,
+          "selected_epoch": 2,
+          "metrics": {
+            "auc": 0.9008626206261039,
+            "accuracy": 0.9826630920464701,
+            "precision": 0.022988505747126436,
+            "recall": 0.14285714285714285,
+            "f1": 0.039603960396039604,
+            "balanced_accuracy": 0.5638134486907108
+          },
+          "train_counts": {
+            "driver": 21,
+            "non_driver": 8372
+          },
+          "test_counts": {
+            "driver": 14,
+            "non_driver": 5581
+          },
+          "class_weights": {
+            "non_driver": 0.5012541806020067,
+            "driver": 199.83333333333331
+          },
+          "validation_counts": {
+            "driver": 7,
+            "non_driver": 2791
+          },
+          "selected_validation_metrics": {
+            "auc": 0.9324358908737268,
+            "accuracy": 0.9846318799142244,
+            "precision": 0.07142857142857142,
+            "recall": 0.42857142857142855,
+            "f1": 0.12244897959183673,
+            "balanced_accuracy": 0.7072989711828838
+          }
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Recorded results, not fresh predictions; no trained model is included in this summary.",
+    "A uses test-fold AUC for epoch selection; its score is not an independent estimate comparable to B/C.",
+    "B and C use inner-validation selection. C restores training mode every epoch; B preserves the authors' mode behavior.",
+    "One seed and three folds do not establish a consistent performance difference. Shared precomputed graph/features remain.",
+    "Class 0 means absent from the positive reference list. Scores are not calibrated cancer risks."
+  ]
+}
