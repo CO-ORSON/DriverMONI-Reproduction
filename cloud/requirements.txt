@@ -1,0 +1,7 @@
+# Community Cloud reads this file beside cloud/app.py before root requirements.
+# Review mode shows published results and prepared measurements, not live inference.
+streamlit==1.66.0
+numpy==1.26.4
+pandas==3.0.6
+pyarrow==18.1.0
+graphviz==0.21

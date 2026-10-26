@@ -1,0 +1,5 @@
+# Optional local web app. Preserve the validated model dependencies.
+-r requirements.txt
+streamlit==1.66.0
+# Arrow 26's wheel requires NumPy 2 at runtime, incompatible with the model.
+pyarrow==18.1.0
